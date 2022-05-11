@@ -2,10 +2,10 @@ import requests
 from deployment import deploy_to_aws
 
 
-add_service = {'name': 'doa-composition-add-service', 'imageUrl': '', 'port': '5000', 'cpu': '256', 'memory': '512',
-               'path': '/doa_service_composition/add', 'priority': '1', 'count': '1'}
-square_service = {'name': 'doa-composition-square-service', 'imageUrl': '', 'port': '5000', 'cpu': '256', 'memory': '512',
-                  'path': '/doa_service_composition/add', 'priority': '1', 'count': '1'}
+add_service = {'name': 'doa-composition-add-service', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
+               'path': '/doa_service_composition/add', 'priority': 1, 'count': 1}
+square_service = {'name': 'doa-composition-square-service', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
+                  'path': '/doa_service_composition/add', 'priority': 1, 'count': 1}
 services = [add_service, square_service]
 
 deploy_to_aws.deploy_services('doa-resources-template.yml','doa-service-template.yml',services)

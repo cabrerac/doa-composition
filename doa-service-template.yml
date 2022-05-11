@@ -65,8 +65,7 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn:
-        Fn::ImportValue:
-          !Join [':', [!Ref 'StackName', 'ECSTaskExecutionRole']]
+        Fn::ImportValue:'ECSTaskExecutionRole'
       #TaskRoleArn:
       #  Fn::If:
       #    - 'HasCustomRole'
@@ -89,8 +88,7 @@ Resources:
     Properties:
       ServiceName: !Ref 'ServiceName'
       Cluster:
-        Fn::ImportValue:
-          !Join [':', [!Ref 'StackName', 'ClusterName']]
+        Fn::ImportValue:'ClusterName'
       LaunchType: FARGATE
       DeploymentConfiguration:
         MaximumPercent: 200
@@ -100,13 +98,10 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - Fn::ImportValue:
-                !Join [':', [!Ref 'StackName', 'FargateContainerSecurityGroup']]
+            - Fn::ImportValue:'FargateContainerSecurityGroup'
           Subnets:
-            - Fn::ImportValue:
-                !Join [':', [!Ref 'StackName', 'PrivateSubnetOne']]
-            - Fn::ImportValue:
-                !Join [':', [!Ref 'StackName', 'PrivateSubnetTwo']]
+            - Fn::ImportValue:'PrivateSubnetOne'
+            - Fn::ImportValue:'PrivateSubnetTwo'
       TaskDefinition: !Ref 'TaskDefinition'
       LoadBalancers:
         - ContainerName: !Ref 'ServiceName'
@@ -132,8 +127,7 @@ Resources:
       Protocol: HTTP
       UnhealthyThresholdCount: 2
       VpcId:
-        Fn::ImportValue:
-          !Join [':', [!Ref 'StackName', 'VPCId']]
+        Fn::ImportValue:'VPCId'
 
   # Create a rule on the load balancer for routing traffic to the target group
   LoadBalancerRule:
@@ -146,6 +140,5 @@ Resources:
         - Field: path-pattern
           Values: [!Ref 'Path']
       ListenerArn:
-        Fn::ImportValue:
-          !Join [':', [!Ref 'StackName', 'PublicListener']]
+        Fn::ImportValue:'PublicListener'
       Priority: !Ref 'Priority'

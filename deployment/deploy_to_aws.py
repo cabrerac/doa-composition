@@ -2,13 +2,17 @@ import base64
 import json
 import os
 import shutil
+from cfn_tools import load_yaml
+import cfn_flip.yaml_dumper
+import yaml
 from datetime import datetime
 
 import boto3
 import botocore
 import docker
 
-ECR_NAME = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/doa-composition'
+#ECR_NAME = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/doa-composition'
+ECR_NAME = 'doa-composition'
 
 
 # deploy resources and services on AWS.
@@ -31,21 +35,10 @@ def deploy_services(resources_template_path, service_template_path, services):
         shutil.copyfile('./' + service['name'], './Dockerfile')
         # pushing image for service
         service = _push_docker_image('.', service, aws_credentials)
-        stack_name = service['name'] + '_stack'
         # reading service template
-        service_template = _parse_template(cloud_client, service_template_path)
+        service_path, stack_name = _create_service_template(service_template_path, service)
+        service_template = _parse_template(cloud_client, service_path)
         print(service_template)
-        # customising service template
-        service_template['Description'] = 'Deploy service ' + service['name'] + ' on AWS Fargate, hosted in a private subnet, but accessible via a public load balancer.'
-        service_template['Parameters']['StackName']['Default'] = stack_name
-        service_template['Parameters']['ServiceName']['Default'] = service['name']
-        service_template['Parameters']['ImageUrl']['Default'] = service['imageUrl']
-        service_template['Parameters']['ContainerPort']['Default'] = service['port']
-        service_template['Parameters']['ContainerCpu']['Default'] = service['cpu']
-        service_template['Parameters']['ContainerMemory']['Default'] = service['memory']
-        service_template['Parameters']['Path']['Default'] = service['path']
-        service_template['Parameters']['Priority']['Default'] = service['priority']
-        service_template['Parameters']['DesiredCount']['Default'] = service['count']
         # creating service stack
         _create_stack(cloud_client, service_template, stack_name)
         print('Stack created for service ' + service['name'] + '...')
@@ -74,6 +67,38 @@ def _read_aws_credentials(filename):
             raise RuntimeError(msg)
 
     return credentials
+
+
+#create a stack template file for a service
+def _create_service_template(service_template_path, service):
+    with open(service_template_path, 'r') as stream:
+        service_template = load_yaml(stream)
+        stack_name = service['name'] + '-stack'
+        # customising service template
+        service_template['Description'] = 'Deploy service ' + service['name'] + ' on AWS Fargate, hosted in a private subnet, but accessible via a public balancer'
+        service_template['Parameters']['StackName']['Default'] = stack_name
+        service_template['Parameters']['ServiceName']['Default'] = service['name']
+        service_template['Parameters']['ImageUrl']['Default'] = service['imageUrl']
+        service_template['Parameters']['ContainerPort']['Default'] = service['port']
+        service_template['Parameters']['ContainerCpu']['Default'] = service['cpu']
+        service_template['Parameters']['ContainerMemory']['Default'] = service['memory']
+        service_template['Parameters']['Path']['Default'] = service['path']
+        service_template['Parameters']['Priority']['Default'] = service['priority']
+        service_template['Parameters']['DesiredCount']['Default'] = service['count']
+        print(service_template)
+        service_path = service['name'] + '-template.yml'
+        with open(service_path, 'w') as f:
+            dumper = cfn_flip.yaml_dumper.get_dumper(clean_up=False, long_form=False)
+            raw = yaml.dump(
+                service_template,
+                Dumper=dumper,
+                default_flow_style=False,
+                allow_unicode=True
+            )
+            f.write(raw)
+        #f = open(service_path, 'w+')
+        #dump_yaml(service_template, f)
+        return service_path, stack_name
 
 
 # parse a stack template
@@ -160,7 +185,6 @@ def _push_docker_image(path, service, aws_credentials):
     # get Docker to login/authenticate with ECR
     docker_client.login(username=ecr_username, password=ecr_password, registry=ecr_url)
     print('Docker client authenticated with ECR...')
-
     # tag image for AWS ECR
     ecr_repo_name = '{}/{}'.format(ecr_url.replace('https://', ''), ECR_NAME)
     image.tag(ecr_repo_name, tag=service_name)
@@ -168,6 +192,7 @@ def _push_docker_image(path, service, aws_credentials):
 
     # push image to AWS ECR
     push_log = docker_client.images.push(ecr_repo_name, tag=service_name)
+    #print(push_log)
     print('Image pushed to AWS ECR: ' + service_name + '...')
     service['imageUrl'] = ECR_NAME + ':' + service_name
     return service
