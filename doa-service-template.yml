@@ -65,7 +65,8 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn:
-        Fn::ImportValue:'ECSTaskExecutionRole'
+        Fn::ImportValue:
+            !Join [':', ['doa-resources', 'ECSTaskExecutionRole']]
       #TaskRoleArn:
       #  Fn::If:
       #    - 'HasCustomRole'
@@ -88,7 +89,8 @@ Resources:
     Properties:
       ServiceName: !Ref 'ServiceName'
       Cluster:
-        Fn::ImportValue:'ClusterName'
+        Fn::ImportValue:
+            !Join [':', ['doa-resources', 'ClusterName']] 
       LaunchType: FARGATE
       DeploymentConfiguration:
         MaximumPercent: 200
@@ -98,10 +100,13 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - Fn::ImportValue:'FargateContainerSecurityGroup'
+            - Fn::ImportValue:
+                  !Join [':', ['doa-resources', 'FargateContainerSecurityGroup']]
           Subnets:
-            - Fn::ImportValue:'PrivateSubnetOne'
-            - Fn::ImportValue:'PrivateSubnetTwo'
+            - Fn::ImportValue:
+                  !Join [':', ['doa-resources', 'PublicSubnetOne']]
+            - Fn::ImportValue:
+                  !Join [':', ['doa-resources', 'PublicSubnetTwo']]
       TaskDefinition: !Ref 'TaskDefinition'
       LoadBalancers:
         - ContainerName: !Ref 'ServiceName'
@@ -127,7 +132,8 @@ Resources:
       Protocol: HTTP
       UnhealthyThresholdCount: 2
       VpcId:
-        Fn::ImportValue:'VPCId'
+        Fn::ImportValue:
+            !Join [':', ['doa-resources', 'VPCId']]
 
   # Create a rule on the load balancer for routing traffic to the target group
   LoadBalancerRule:
@@ -140,5 +146,6 @@ Resources:
         - Field: path-pattern
           Values: [!Ref 'Path']
       ListenerArn:
-        Fn::ImportValue:'PublicListener'
+        Fn::ImportValue:
+            !Join [':', ['doa-resources', 'PublicListener']]
       Priority: !Ref 'Priority'
