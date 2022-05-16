@@ -12,6 +12,7 @@ import botocore
 import docker
 
 #ECR_NAME = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/doa-composition'
+BASE_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
 ECR_NAME = 'doa-composition'
 
 
@@ -38,7 +39,6 @@ def deploy_services(resources_template_path, service_template_path, services):
         # reading service template
         service_path, stack_name = _create_service_template(service_template_path, service)
         service_template = _parse_template(cloud_client, service_path)
-        print(service_template)
         # creating service stack
         _create_stack(cloud_client, service_template, stack_name)
         print('Stack created for service ' + service['name'] + '...')
@@ -85,7 +85,6 @@ def _create_service_template(service_template_path, service):
         service_template['Parameters']['Path']['Default'] = service['path']
         service_template['Parameters']['Priority']['Default'] = service['priority']
         service_template['Parameters']['DesiredCount']['Default'] = service['count']
-        print(service_template)
         service_path = service['name'] + '-template.yml'
         with open(service_path, 'w') as f:
             dumper = cfn_flip.yaml_dumper.get_dumper(clean_up=False, long_form=False)
@@ -187,6 +186,7 @@ def _push_docker_image(path, service, aws_credentials):
     print('Docker client authenticated with ECR...')
     # tag image for AWS ECR
     ecr_repo_name = '{}/{}'.format(ecr_url.replace('https://', ''), ECR_NAME)
+    print(ecr_repo_name)
     image.tag(ecr_repo_name, tag=service_name)
     print('Image tagged for AWS ECR: ' + service_name + '...')
 
@@ -194,5 +194,5 @@ def _push_docker_image(path, service, aws_credentials):
     push_log = docker_client.images.push(ecr_repo_name, tag=service_name)
     #print(push_log)
     print('Image pushed to AWS ECR: ' + service_name + '...')
-    service['imageUrl'] = ECR_NAME + ':' + service_name
+    service['imageUrl'] = BASE_URL + ECR_NAME + ':' + service_name
     return service
