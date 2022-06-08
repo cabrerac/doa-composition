@@ -4,7 +4,7 @@ from flask import Flask, jsonify, make_response, request
 app = Flask('__name__')
 
 
-@app.route('/', methods=['GET'])
+@app.route('/doa_service_composition/home', methods=['GET'])
 def home():
     return make_response({'res': 'Hello world!!!'})
 
