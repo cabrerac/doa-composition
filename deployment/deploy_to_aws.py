@@ -13,7 +13,6 @@ import docker
 
 BASE_ECR_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
 ECR_NAME = 'doa-composition'
-external_url = ''
 
 
 # deploy resources and services on AWS.
@@ -29,13 +28,15 @@ def deploy_services(resources_template_path, service_template_path, services):
     # reading resources template
     resources_template = _parse_template(cloud_client, resources_template_path)
     # creating resources stack
+    external_url = ''
     res = _create_stack(cloud_client, resources_template, 'doa-resources')
-    global external_url
-    if external_url == '':
-        outputs = res['Stacks']['Outputs']
-        for output in outputs:
-            if output['OutputKey'] == 'ExternalUrl':
-                external_url = output['OutputValue']
+    stacks = res['Stacks']
+    for stack in stacks:
+        if stack['StackName'] == 'doa-resources':
+            outputs = stack['Outputs']
+            for output in outputs:
+                if output['OutputKey'] == 'ExternalUrl':
+                    external_url = output['OutputValue']
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
@@ -123,8 +124,10 @@ def _create_stack(cloud_client, template_body, stack_name):
         'TemplateBody': template_body,
     }
     try:
-        if _stack_exists(cloud_client, stack_name):
+        exists, stack_id = _stack_exists(cloud_client, stack_name)
+        if exists:
             print('Updating stack ' + stack_name + '...')
+            res = cloud_client.describe_stacks(StackName=stack_id)
             stack_result = cloud_client.update_stack(**params, Capabilities=['CAPABILITY_IAM'])
             waiter = cloud_client.get_waiter('stack_update_complete')
         else:
@@ -140,8 +143,7 @@ def _create_stack(cloud_client, template_body, stack_name):
         else:
             raise
     else:
-        res = json.dumps(cloud_client.describe_stacks(StackName=stack_result['StackId']),indent=2, default=json_serial)
-        # print(res)
+        res = cloud_client.describe_stacks(StackName=stack_result['StackId'])
     return res
 
 
@@ -152,8 +154,8 @@ def _stack_exists(cloud_client, stack_name):
         if stack['StackStatus'] == 'DELETE_COMPLETE':
             continue
         if stack_name == stack['StackName']:
-            return True
-    return False
+            return True, stack['StackId']
+    return False, -1
 
 
 def json_serial(obj):

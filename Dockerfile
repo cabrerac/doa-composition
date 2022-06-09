@@ -14,8 +14,8 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/home.py .
+COPY microservices/square.py .
 
 # Specify the command to run on container start
-CMD ["python", "./home.py"]
+CMD ["python", "./square.py"]
 

@@ -4,7 +4,7 @@ from flask import Flask, make_response
 app = Flask('__name__')
 
 
-@app.route('/doa_service_composition/home', methods=['GET', 'POST'])
+@app.route('/doa_composition/home', methods=['GET', 'POST'])
 def home():
     return make_response({'res': 'Hello world!!!'})
 
