@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, make_response, request
 
 app = Flask(__name__)
 
 
-@app.route('/doa_service_composition/square')
+@app.route('/doa_service_composition/square', methods=['GET, POST'])
 def square():
     parameters = request.get_json()
     p = parameters['p']

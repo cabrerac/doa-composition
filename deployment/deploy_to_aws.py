@@ -11,9 +11,9 @@ import boto3
 import botocore
 import docker
 
-#ECR_NAME = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/doa-composition'
-BASE_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
+BASE_ECR_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
 ECR_NAME = 'doa-composition'
+external_url = ''
 
 
 # deploy resources and services on AWS.
@@ -29,19 +29,28 @@ def deploy_services(resources_template_path, service_template_path, services):
     # reading resources template
     resources_template = _parse_template(cloud_client, resources_template_path)
     # creating resources stack
-    _create_stack(cloud_client, resources_template, 'doa-resources')
+    res = _create_stack(cloud_client, resources_template, 'doa-resources')
+    global external_url
+    if external_url == '':
+        outputs = res['Stacks']['Outputs']
+        for output in outputs:
+            if output['OutputKey'] == 'ExternalUrl':
+                external_url = output['OutputValue']
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
-        shutil.copyfile('./' + service['name'], './Dockerfile')
+        shutil.copyfile('./dockers/' + service['name'], './Dockerfile')
         # pushing image for service
         service = _push_docker_image('.', service, aws_credentials)
         # reading service template
         service_path, stack_name = _create_service_template(service_template_path, service)
         service_template = _parse_template(cloud_client, service_path)
         # creating service stack
-        _create_stack(cloud_client, service_template, stack_name)
+        res = _create_stack(cloud_client, service_template, stack_name)
         print('Stack created for service ' + service['name'] + '...')
+        os.remove(service_path)
+    print(external_url)
+    return external_url
 
 
 # read aws credentials from file or environment variables
@@ -69,7 +78,7 @@ def _read_aws_credentials(filename):
     return credentials
 
 
-#create a stack template file for a service
+# create a stack template file for a service
 def _create_service_template(service_template_path, service):
     with open(service_template_path, 'r') as stream:
         service_template = load_yaml(stream)
@@ -95,8 +104,6 @@ def _create_service_template(service_template_path, service):
                 allow_unicode=True
             )
             f.write(raw)
-        #f = open(service_path, 'w+')
-        #dump_yaml(service_template, f)
         return service_path, stack_name
 
 
@@ -110,6 +117,7 @@ def _parse_template(cloud_client, template_path):
 
 # create stack in aws
 def _create_stack(cloud_client, template_body, stack_name):
+    res = {}
     params = {
         'StackName': stack_name,
         'TemplateBody': template_body,
@@ -132,11 +140,9 @@ def _create_stack(cloud_client, template_body, stack_name):
         else:
             raise
     else:
-        print(json.dumps(
-            cloud_client.describe_stacks(StackName=stack_result['StackId']),
-            indent=2,
-            default=json_serial
-        ))
+        res = json.dumps(cloud_client.describe_stacks(StackName=stack_result['StackId']),indent=2, default=json_serial)
+        # print(res)
+    return res
 
 
 # validate if stack exists in AWS
@@ -192,7 +198,7 @@ def _push_docker_image(path, service, aws_credentials):
 
     # push image to AWS ECR
     push_log = docker_client.images.push(ecr_repo_name, tag=service_name)
-    #print(push_log)
+    # print(push_log)
     print('Image pushed to AWS ECR: ' + service_name + '...')
-    service['imageUrl'] = BASE_URL + ECR_NAME + ':' + service_name
+    service['imageUrl'] = BASE_ECR_URL + ECR_NAME + ':' + service_name
     return service
