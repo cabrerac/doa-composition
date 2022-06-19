@@ -1,5 +1,6 @@
 from deployment import deploy_to_aws
 from clients import client
+import time
 
 # Defining services to register and create in the AWS infrastructure
 print('0. Defining services...')
@@ -28,7 +29,7 @@ def square_addition(s1, s2):
     square = client.make_request(external_url, square_service['path'], parameters)
     print('(' + str(s1) + ' + ' + str(s2) + ')^2 = ' + str(square['res']))
 
-
+time.sleep(30)
 print('2. Executing simple centralised composition...')
 square_addition(4, 5)
 
