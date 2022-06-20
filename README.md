@@ -20,10 +20,12 @@ Right now there is a simple and centralised service composition implemented in t
 
 ## How to run it?
 
-You can run the code (i.e., deploying services defined in the `./main.py` file and execute a simple composition) using the following command: `python main.py`.
+You can run the code (i.e., deploying services defined in the `./main.py` file and execute a simple composition) using the following command: 
+
+`python main.py`
 
 Our code uses AWS credentials to log into AWS from console. These credetils can be conigured as context variables as follows:
 
-`export AWS_REGION=xxxx
-export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-export AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxxx`
+`export AWS_REGION=xxxx`
+`export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+`export AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxxx`
