@@ -24,7 +24,7 @@ You can run the code (i.e., deploying services defined in the `./main.py` file a
 
 `python main.py`
 
-Our code uses AWS credentials to log into AWS from console. These credetils can be conigured as context variables as follows:
+Our code uses AWS credentials to log into AWS from console. These credetils can be conigured as context variables:
 
 `export AWS_REGION=xxxx`
 
