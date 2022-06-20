@@ -8,11 +8,11 @@ One key element of this project is the automatic deployment of infrastructure re
 
 The automatic deployment is implemented in the `./deployment/deploy_to_aws.py` file which submits container images and Cloud Formations to AWS. 
 
-There are two templates in the `./templates/` folder, which are used to create the resources cloud formation and the services cloud formations. The resources cloud formation is submitted once at the beginning of the experiments. A service cloud formation is submitted for each service defined in the `main.py` file.
+There are two templates in the `./templates/` folder, which are used to create the resources cloud formation and the services cloud formations. The resources cloud formation is submitted once at the beginning of the experiments. A service cloud formation is submitted for each service defined in the `./main.py` file.
 
 Each service requires a container image which must be defined by a docker file. The `./dockers/` folder should contain the docker file for each service we want to deploy. If a service requires a particular python module, you can add it to the `./requirements-microservices.txt` file.
 
-The `./microservices` folder contains the actual implementation of each service.
+The `./microservices` folder contains the actual implementation of each service  using Flask.
 
 ## Service Composition
 
