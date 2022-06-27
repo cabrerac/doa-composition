@@ -14,7 +14,7 @@ services = [home_service, add_service, square_service]
 
 # Deploying AWS resources and services
 print('1. Deploying services...')
-external_url = deploy_to_aws.deploy_services('templates/doa-resources-template.yml',
+external_url, rabbitMQ_urls = deploy_to_aws.deploy_services('templates/doa-resources-template.yml',
                                              'templates/doa-service-template.yml', services)
 
 

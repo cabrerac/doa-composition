@@ -253,7 +253,7 @@ Resources:
     Type: "AWS::AmazonMQ::Broker"
     Properties: 
       AutoMinorVersionUpgrade: "false"
-      BrokerName: "doaCompositionBroker"
+      BrokerName: "doaRabbitMQ"
       DeploymentMode: SINGLE_INSTANCE
       EngineType: RabbitMQ
       EngineVersion: "3.9.16"
