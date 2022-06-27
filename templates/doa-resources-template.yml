@@ -297,3 +297,17 @@ Outputs:
     Value: !Ref 'FargateContainerSecurityGroup'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'FargateContainerSecurityGroup' ] ]
+  BasicBroker:
+    Type: "AWS::AmazonMQ::Broker"
+    Properties: 
+      AutoMinorVersionUpgrade: "false"
+      BrokerName: !Join [ ':', [ !Ref 'AWS::StackName', 'RabbitBroker' ] ]
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: RabbitMQ
+      EngineVersion: "3.9.16"
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: "true"
+      Users: 
+        - 
+          Password: doa-composition            
+          Username: doa-composition
