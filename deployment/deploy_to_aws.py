@@ -29,6 +29,7 @@ def deploy_services(resources_template_path, service_template_path, services):
     resources_template = _parse_template(cloud_client, resources_template_path)
     # creating resources stack
     external_url = ''
+    broker_urls = []
     res = _create_stack(cloud_client, resources_template, 'doa-resources')
     stacks = res['Stacks']
     for stack in stacks:
@@ -37,6 +38,8 @@ def deploy_services(resources_template_path, service_template_path, services):
             for output in outputs:
                 if output['OutputKey'] == 'ExternalUrl':
                     external_url = output['OutputValue']
+                if output['OutputKey'] == 'BrokerUrl':
+                    broker_urls = output['OutputValue']
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
@@ -51,7 +54,8 @@ def deploy_services(resources_template_path, service_template_path, services):
         print('Stack created for service ' + service['name'] + '...')
         os.remove(service_path)
     print(external_url)
-    return external_url
+    print(broker_urls)
+    return external_url, broker_urls
 
 
 # read aws credentials from file or environment variables
