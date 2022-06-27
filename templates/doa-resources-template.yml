@@ -315,6 +315,6 @@ Outputs:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'FargateContainerSecurityGroup' ] ]
   AmqpEndpoints:
     Description: AMQP endpoints that services use to communicate between them
-    Value: !Join [',', !GetAtt 'RabbitBroker.AmqpEndpoints']
+    Value: !Join [ ',', !GetAtt 'RabbitBroker.AmqpEndpoints' ]
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'AmqpEndpoints' ] ]
