@@ -315,6 +315,6 @@ Outputs:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'FargateContainerSecurityGroup' ] ]
   BrokerUrl:
     Description: A basic RabbitMQ Broker for services communication
-    Value: !GetAtt 'BasicBroker.AmqpEndpoints'
+    Value: [!GetAtt 'BasicBroker.AmqpEndpoints']
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'BrokerUrl' ] ]
