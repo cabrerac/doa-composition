@@ -20,7 +20,8 @@ print('1. Deploying services...')
 external_url, rabbitmq_url = deploy_to_aws.deploy_services('templates/doa-resources-template.yml',
                                                             'templates/doa-service-template.yml',
                                                             './rabbit-mq.yaml', services)
-
+print('Load Balancer URL: ' + external_url)
+print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
 def square_addition_centralised(s1, s2):

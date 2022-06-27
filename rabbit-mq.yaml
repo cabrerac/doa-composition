@@ -1,3 +1,3 @@
-rabbitmq_url: rabbitMQ_url
+rabbitmq_url: amqps://b-817b5ed4-238a-4cac-b94c-5ec2df037b24.mq.eu-west-2.amazonaws.com:5671
 username: doa-composition
 password: doa-composition

@@ -54,8 +54,6 @@ def deploy_services(resources_template_path, service_template_path, rabbitmq_cre
         res = _create_stack(cloud_client, service_template, stack_name)
         print('Stack created for service ' + service['name'] + '...')
         os.remove(service_path)
-    print(external_url)
-    print(rabbitmq_url)
     return external_url, rabbitmq_url
 
 
@@ -212,9 +210,16 @@ def _push_docker_image(path, service, aws_credentials):
 
 
 # update rabbitmq credentials file with the url of the created broker
-def _update_rabbitmq_credentials(rabbitmq_urls, rabbitmq_credentials_path):
+def _update_rabbitmq_credentials(rabbitmq_url, rabbitmq_credentials_path):
     with open(rabbitmq_credentials_path, 'r') as stream:
         rabbitmq_credentials = load_yaml(stream)
-        rabbitmq_credentials['rabbitmq_url'] = rabbitmq_urls.split(',')
-    with open(rabbitmq_credentials_path, 'w') as file:
-        yaml.dump(rabbitmq_credentials, file)
+        rabbitmq_credentials['rabbitmq_url'] = rabbitmq_url
+    with open(rabbitmq_credentials_path, 'w') as f:
+             dumper = cfn_flip.yaml_dumper.get_dumper(clean_up=False, long_form=False)
+             raw = yaml.dump(
+                 rabbitmq_credentials,
+                 Dumper=dumper,
+                 default_flow_style=False,
+                 allow_unicode=True
+             )
+             f.write(raw)
