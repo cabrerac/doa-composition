@@ -308,6 +308,6 @@ Outputs:
       HostInstanceType: mq.t3.micro
       PubliclyAccessible: "true"
       Users: 
-        - 
+         - 
           Password: doa-composition            
           Username: doa-composition
