@@ -247,6 +247,22 @@ Resources:
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
               Resource: '*'
+  
+  # This is a broker that services uses to communicate between them.
+  BasicBroker:
+    Type: "AWS::AmazonMQ::Broker"
+    Properties: 
+      AutoMinorVersionUpgrade: "false"
+      BrokerName: !Join [ ':', [ !Ref 'AWS::StackName', 'BasicBroker' ] ]
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: RabbitMQ
+      EngineVersion: "3.9.16"
+      HostInstanceType: mq.t3.micro
+      PubliclyAccessible: "true"
+      Users: 
+         - 
+          Password: doa-composition            
+          Username: doa-composition
 
 # These are the values output by the CloudFormation template. Be careful
 # about changing any of them, because of them are exported with specific
@@ -298,16 +314,7 @@ Outputs:
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'FargateContainerSecurityGroup' ] ]
   BasicBroker:
-    Type: "AWS::AmazonMQ::Broker"
-    Properties: 
-      AutoMinorVersionUpgrade: "false"
-      BrokerName: !Join [ ':', [ !Ref 'AWS::StackName', 'RabbitBroker' ] ]
-      DeploymentMode: SINGLE_INSTANCE
-      EngineType: RabbitMQ
-      EngineVersion: "3.9.16"
-      HostInstanceType: mq.t3.micro
-      PubliclyAccessible: "true"
-      Users: 
-         - 
-          Password: doa-composition            
-          Username: doa-composition
+    Description: A basic RabbitMQ Broker for services communication
+    Value: !Ref 'BasicBroker'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'BasicBroker' ] ]
