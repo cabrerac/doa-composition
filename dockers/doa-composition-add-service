@@ -7,6 +7,9 @@ EXPOSE 5000/tcp
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the rabbitMQ credentials to the working directory
+COPY rabbit-mq.yaml .
+
 # Copy the dependencies file to the working directory
 COPY requirements-microservices.txt .
 

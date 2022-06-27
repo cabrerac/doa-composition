@@ -16,7 +16,7 @@ ECR_NAME = 'doa-composition'
 
 
 # deploy resources and services on AWS.
-def deploy_services(resources_template_path, service_template_path, services):
+def deploy_services(resources_template_path, service_template_path, rabbitmq_credentials_path, services):
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
     access_key_id = aws_credentials['access_key_id']
@@ -29,7 +29,7 @@ def deploy_services(resources_template_path, service_template_path, services):
     resources_template = _parse_template(cloud_client, resources_template_path)
     # creating resources stack
     external_url = ''
-    rabbitMQ_urls = ''
+    rabbitmq_url = ''
     res = _create_stack(cloud_client, resources_template, 'doa-resources')
     stacks = res['Stacks']
     for stack in stacks:
@@ -39,7 +39,8 @@ def deploy_services(resources_template_path, service_template_path, services):
                 if output['OutputKey'] == 'ExternalUrl':
                     external_url = output['OutputValue']
                 if output['OutputKey'] == 'AmqpEndpoints':
-                    rabbitMQ_urls = output['OutputValue']
+                    rabbitmq_url = output['OutputValue']
+    _update_rabbitmq_credentials(rabbitmq_url, rabbitmq_credentials_path)
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
@@ -54,8 +55,8 @@ def deploy_services(resources_template_path, service_template_path, services):
         print('Stack created for service ' + service['name'] + '...')
         os.remove(service_path)
     print(external_url)
-    print(rabbitMQ_urls)
-    return external_url, rabbitMQ_urls
+    print(rabbitmq_url)
+    return external_url, rabbitmq_url
 
 
 # read aws credentials from file or environment variables
@@ -208,3 +209,12 @@ def _push_docker_image(path, service, aws_credentials):
     print('Image pushed to AWS ECR: ' + service_name + '...')
     service['imageUrl'] = BASE_ECR_URL + ECR_NAME + ':' + service_name
     return service
+
+
+# update rabbitmq credentials file with the url of the created broker
+def _update_rabbitmq_credentials(rabbitmq_urls, rabbitmq_credentials_path):
+    with open(rabbitmq_credentials_path, 'r') as stream:
+        rabbitmq_credentials = load_yaml(stream)
+        rabbitmq_credentials['rabbitmq_url'] = rabbitmq_urls.split(',')
+    with open(rabbitmq_credentials_path, 'w') as file:
+        yaml.dump(rabbitmq_credentials, file)
