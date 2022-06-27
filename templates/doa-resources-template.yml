@@ -248,8 +248,8 @@ Resources:
                 - 'logs:PutLogEvents'
               Resource: '*'
   
-  # This is a broker that services uses to communicate between them.
-  BasicBroker:
+  # This is a rabbit broker that services use to communicate between them.
+  RabbitBroker:
     Type: "AWS::AmazonMQ::Broker"
     Properties: 
       AutoMinorVersionUpgrade: "false"
@@ -313,8 +313,8 @@ Outputs:
     Value: !Ref 'FargateContainerSecurityGroup'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'FargateContainerSecurityGroup' ] ]
-  BrokerUrl:
-    Description: A basic RabbitMQ Broker for services communication
-    Value: [!GetAtt 'BasicBroker.AmqpEndpoints']
+  AmqpEndpoints:
+    Description: AMQP endpoints that services use to communicate between them
+    Value: !Join [',', !GetAtt 'RabbitBroker.AmqpEndpoints']
     Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'BrokerUrl' ] ]
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'AmqpEndpoints' ] ]
