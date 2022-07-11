@@ -1,30 +1,17 @@
 from flask import Flask, make_response, request
 import pika
 import time
-from cfn_tools import load_yaml
+import logic.util as util
+import logic.square_function as logic
 
 
-def _read_rabbit_credentials(file):
-    with open(file, 'r') as stream:
-        credentials = load_yaml(stream)
-        return credentials
-
-
-# Interfaces
-app = Flask(__name__)
-
-
-@app.route('/doa_composition/square', methods=['GET', 'POST'])
-def square():
-    parameters = request.get_json()
-    p = parameters['p']
-    return make_response({'res': _square_function(p)})
-
-
+# Listening for RabbitMQ Messages
 sleepTime = 10
 time.sleep(30)
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
+host = credentials['host']
+connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
 channel = connection.channel()
 channel.queue_declare(queue='task_square', durable=True)
 
@@ -46,24 +33,16 @@ channel.basic_consume(queue='task_square', on_message_callback=_callback)
 channel.start_consuming()
 
 
-def _publish_message(msg, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
-    channel = connection.channel()
-    channel.queue_declare(queue=queue, durable=True)
-    channel.basic_publish(
-        exchange='',
-        routing_key=queue,
-        body=msg,
-        properties=pika.BasicProperties(
-            delivery_mode=2,
-        ))
-    connection.close()
+# Flask interface
+app = Flask(__name__)
+
+
+@app.route('/doa_composition/square', methods=['GET', 'POST'])
+def square():
+    parameters = request.get_json()
+    p = parameters['p']
+    return make_response({'res': logic.square_function(p)})
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
-# function
-def _square_function(p):
-    return p * p

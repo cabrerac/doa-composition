@@ -19,6 +19,15 @@ RUN pip install -r requirements-microservices.txt
 # Copy the microservice code to the working directory
 COPY microservices/home.py .
 
+# Create logic directory
+RUN mkdir ./logic
+
+# Copy the util code to the working directory
+COPY microservices/logic/util.py ./logic/
+
+# Copy the function code to the working directory
+COPY microservices/logic/home_function.py ./logic/
+
 # Specify the command to run on container start
 CMD ["python", "./home.py"]
 
