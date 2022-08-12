@@ -17,13 +17,10 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/home.py .
+COPY microservices/home_async.py .
 
 # Create logic directory
-RUN mkdir /app/logic
-
-RUN pwd
-RUN ls -la
+RUN mkdir ./logic
 
 # Copy the util code to the working directory
 COPY microservices/logic/util.py ./logic/
@@ -31,8 +28,13 @@ COPY microservices/logic/util.py ./logic/
 # Copy the function code to the working directory
 COPY microservices/logic/home_function.py ./logic/
 
-RUN ls -la logic
+# Create clients directory
+RUN mkdir ./clients
+
+# Copy the rabbitmq consumer and producer
+COPY clients/consumer.py ./clients/
+COPY clients/producer.py ./clients/
 
 # Specify the command to run on container start
-CMD ["python", "./home.py"]
+CMD ["python", "-u", "./home_async.py"]
 

@@ -6,7 +6,7 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 
 # Approach
-approaches = ['centralised', 'doa']
+approaches = ['doa']
 
 # Defining services to register and create in the AWS infrastructure
 print('0. Defining services...')
@@ -43,7 +43,7 @@ print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
 def callback(ch, method, properties, body):
     msg = body.decode()
-    print('Received:' + msg)
+    print('Received: ' + msg)
 
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
@@ -62,10 +62,9 @@ def square_addition_centralised(s1, s2):
 def square_addition_doa(s1, s2):
     parameters = {}
     credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
-    consumer = Consumer(credentials, 'end_user', callback)
-    producer = Producer(credentials)
+    producer = Producer(credentials, home_service_async['queue'])
     producer.publish(home_service_async['queue'], 'request from main!!!')
-
+    consumer = Consumer(credentials, 'end_user', callback)
     """parameters = {'s1': s1, 's2': s2}
     addition = client.make_request(external_url, add_service['path'], parameters)
     parameters = {'p': addition['res']}

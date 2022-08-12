@@ -16,6 +16,6 @@ class Consumer:
         connection = pika.BlockingConnection(rabbit_parameters)
         channel = connection.channel()
         channel.queue_declare(queue=queue, durable=True)
-        channel.basic_consume(queue='home_service', on_message_callback=callback)
+        channel.basic_consume(queue=queue, on_message_callback=callback)
         print(' :::: Waiting for messages :::: ')
         channel.start_consuming()
