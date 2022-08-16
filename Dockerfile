@@ -36,5 +36,5 @@ COPY clients/consumer.py ./clients/
 COPY clients/producer.py ./clients/
 
 # Specify the command to run on container start
-CMD ["python", "-u", "./home_async.py"]
+CMD ["python", "./home_async.py"]
 
