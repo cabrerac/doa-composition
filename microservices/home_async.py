@@ -5,10 +5,12 @@ from clients.consumer import Consumer
 
 credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
 
+
 def callback(ch, method, properties, body):
     msg = body.decode()
     print('Received: ' + msg)
-    producer = Producer(credentials, 'end_user')
-    producer.publish('end_user', 'response from service!!!')
+    producer = Producer(credentials)
+    producer.publish('user.response', 'response from service!!!')
 
-consumer = Consumer(credentials, 'home_service', callback)
+
+consumer = Consumer(credentials, 'service.home', callback)

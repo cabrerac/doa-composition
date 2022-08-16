@@ -4,7 +4,7 @@ import ssl
 
 class Producer:
 
-    def __init__(self, credentials, queue):
+    def __init__(self, credentials):
         rabbit_url = credentials['rabbitmq_url']
         rabbit_port = credentials['port']
         rabbit_virtual_host = credentials['virtual_host']
@@ -15,9 +15,9 @@ class Producer:
                                                       ssl_options=pika.SSLOptions(rabbit_context))
         self.connection = pika.BlockingConnection(rabbit_parameters)
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=queue, durable=True)
+        self.channel.exchange_declare(exchange='messages', exchange_type='topic')
 
     def publish(self, routing_key, body):
-        self.channel.basic_publish(exchange='', routing_key=routing_key, body=body)
-        print(" [x] Sent " + body)
+        self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body)
+        print(" [x] Sent to " + routing_key + " Message: " + body)
         self.connection.close()
