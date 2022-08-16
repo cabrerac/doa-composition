@@ -12,7 +12,7 @@ def callback(ch, method, properties, body):
     print('Received: ' + msg)
     time.sleep(3)
     producer = Producer(credentials)
-    producer.publish('user.response', logic.home_function()')
+    producer.publish('user.response', logic.home_function())
 
 
 consumer = Consumer(credentials, 'service.home', callback)

@@ -18,7 +18,7 @@ home_service_sync = {
 
 home_service_async = {
     'name': 'home-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/', 'priority': 2, 'count': 1, 'topic': 'service.home'
+    'path': '/', 'priority': 2, 'count': 1, 'topic': 'service.home'
 }
 
 add_service = {
