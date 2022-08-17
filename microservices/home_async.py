@@ -9,6 +9,7 @@ credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
 
 
 def callback(ch, method, properties, body):
+    time.sleep(5)
     message = json.loads(body)
     next_topic = message['next_topic']
     message_dict = {

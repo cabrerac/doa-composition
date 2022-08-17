@@ -20,7 +20,7 @@ home_service_sync = {
 
 home_service_async = {
     'name': 'home-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/', 'priority': 2, 'count': 1, 'topic': 'service.home'
+    'path': '/doa_composition/home', 'priority': 2, 'count': 1, 'topic': 'service.home'
 }
 
 add_service_sync = {
@@ -30,7 +30,7 @@ add_service_sync = {
 
 add_service_async = {
     'name': 'add-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/', 'priority': 4, 'count': 1, 'topic': 'service.add'
+    'path': '/doa_composition/add', 'priority': 4, 'count': 1, 'topic': 'service.add'
 }
 
 square_service_sync = {
@@ -40,7 +40,7 @@ square_service_sync = {
 
 square_service_async = {
     'name': 'square-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/', 'priority': 6, 'count': 1, 'topic': 'service.add'
+    'path': '/doa_composition/square', 'priority': 6, 'count': 1, 'topic': 'service.square'
 }
 
 services = [home_service_sync, home_service_async, add_service_sync, add_service_async, square_service_sync,
