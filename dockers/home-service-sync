@@ -27,4 +27,3 @@ COPY microservices/logic/home_function.py ./logic/
 
 # Specify the command to run on container start
 CMD ["python", "./home_sync.py"]
-

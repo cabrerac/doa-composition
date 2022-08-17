@@ -7,9 +7,6 @@ EXPOSE 5000/tcp
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the rabbitMQ credentials to the working directory
-COPY rabbit-mq.yaml .
-
 # Copy the dependencies file to the working directory
 COPY requirements-microservices.txt .
 
@@ -17,7 +14,7 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/square.py .
+COPY microservices/square_sync.py .
 
 # Create logic directory
 RUN mkdir ./logic
@@ -29,5 +26,4 @@ COPY microservices/logic/util.py ./logic/
 COPY microservices/logic/square_function.py ./logic/
 
 # Specify the command to run on container start
-CMD ["python", "./square.py"]
-
+CMD ["python", "./square_sync.py"]
