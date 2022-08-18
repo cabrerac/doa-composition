@@ -11,9 +11,10 @@ credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
 def callback(ch, method, properties, body):
     time.sleep(5)
     message = json.loads(body)
+    req_id = message['req_id']
     next_topic = message['next_topic']
     message_dict = {
-        'user_topic': 'user.response', 'desc': 'response from home!!!', 'next_topic': 'user.response',
+        'req_id': req_id, 'user_topic': 'user.response', 'desc': 'response from home!!!', 'next_topic': 'user.response',
         'res': logic.home_function()
     }
     message_json = json.dumps(message_dict, indent=4)

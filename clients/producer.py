@@ -15,9 +15,9 @@ class Producer:
                                                       ssl_options=pika.SSLOptions(rabbit_context))
         self.connection = pika.BlockingConnection(rabbit_parameters)
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange='messages', exchange_type='topic')
+        self.channel.exchange_declare(exchange='messages', exchange_type='topic', durable=True)
 
     def publish(self, routing_key, body):
         self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body)
-        print(" [x] Sent to " + routing_key + " Message: " + body)
+        print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
         self.connection.close()

@@ -10,6 +10,7 @@ credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
 def callback(ch, method, properties, body):
     p = None
     message = json.loads(body)
+    req_id = message['req_id']
     next_topic = message['next_topic']
     parameters = message['parameters']
     for parameter in parameters:
@@ -17,8 +18,8 @@ def callback(ch, method, properties, body):
             p = parameter['value']
     res = logic.square_function(p)
     message_dict = {
-        'user_topic': 'user.response', 'desc': 'message from square!!!', 'next_topic': 'user.response',
-        'res': logic.square_function(p)
+        'req_id': req_id, 'user_topic': 'user.response', 'desc': 'message from square!!!',
+        'next_topic': 'user.response', 'res': logic.square_function(p)
     }
     message_json = json.dumps(message_dict, indent=4)
     producer = Producer(credentials)

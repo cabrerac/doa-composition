@@ -11,6 +11,7 @@ def callback(ch, method, properties, body):
     a = None
     b = None
     message = json.loads(body)
+    req_id = message['req_id']
     next_topic = message['next_topic']
     parameters = message['parameters']
     for parameter in parameters:
@@ -20,7 +21,7 @@ def callback(ch, method, properties, body):
             b = parameter['value']
     p = logic.add_function(a, b)
     message_dict = {
-        'user_topic': 'user.response', 'desc': 'message from add!!!', 'next_topic': 'user.response',
+        'req_id': req_id, 'user_topic': 'user.response', 'desc': 'message from add!!!', 'next_topic': 'user.response',
         'parameters': [
             {'name': 'p', 'value': p}
         ]
