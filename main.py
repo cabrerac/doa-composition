@@ -59,7 +59,6 @@ print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
 
 def callback(ch, method, properties, body):
-    #ch.close()
     message = json.loads(body)
     res = message['res']
     req_id = message['req_id']
@@ -67,9 +66,6 @@ def callback(ch, method, properties, body):
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
     print(rt_metric)
-    #credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-    #consumer_thread = Consumer(credentials, 'user.response', callback)
-    #consumer_thread.start()
 
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers

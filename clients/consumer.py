@@ -27,4 +27,3 @@ class Consumer(threading.Thread):
     def run(self):
         print(' [*] Waiting for messages...')
         self.channel.start_consuming()
-        
