@@ -47,6 +47,10 @@ Parameters:
     Default: ""
     Description: (Optional) An IAM role to give the service's containers if the code within needs to
                  access other AWS resources like S3 buckets, DynamoDB tables, etc
+  TargetType:
+    Type: String
+    Default: "ip"
+    Description: Target type of the deployed service
 
 #Conditions:
 #  HasCustomRole: !Not [ !Equals [!Ref 'Role', ''] ]
@@ -125,7 +129,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
-      TargetType: ip
+      TargetType: !Ref 'TargetType'
       Name: !Ref 'ServiceName'
       Port: !Ref 'ContainerPort'
       Protocol: HTTP

@@ -98,6 +98,7 @@ def _create_service_template(service_template_path, service):
         service_template['Parameters']['Path']['Default'] = service['path']
         service_template['Parameters']['Priority']['Default'] = service['priority']
         service_template['Parameters']['DesiredCount']['Default'] = service['count']
+        service_template['Parameters']['TargetType']['Default'] = service['TargetType']
         service_path = service['name'] + '-template.yml'
         with open(service_path, 'w') as f:
             dumper = cfn_flip.yaml_dumper.get_dumper(clean_up=False, long_form=False)
