@@ -33,7 +33,7 @@ add_service_sync = {
 
 add_service_async = {
     'name': 'add-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 4, 'count': 1, 'topic': 'service.add'
+    'path': '/doa_composition/add_async', 'priority': 4, 'count': 1, 'topic': 'service.add'
 }
 
 square_service_sync = {
@@ -43,10 +43,11 @@ square_service_sync = {
 
 square_service_async = {
     'name': 'square-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 6, 'count': 1, 'topic': 'service.square'
+    'path': '/doa_composition/square_async', 'priority': 6, 'count': 1, 'topic': 'service.square'
 }
 
-services = [home_service_sync, home_service_async]
+services = [home_service_sync, home_service_async, add_service_sync, add_service_async, square_service_sync,
+            square_service_async]
 
 # Deploying AWS resources and services
 print('1. Deploying services...')
@@ -73,7 +74,9 @@ def callback(ch, method, properties, body):
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
 def centralised_composition(s1, s2):
+    time.sleep(5)
     req_id = 'cen_1'
+    print('Request: ' + req_id)
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
     rt_metric[req_id] = rt_measurement
     parameters = {}
@@ -82,7 +85,9 @@ def centralised_composition(s1, s2):
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
 
-    """req_id = 'cen_2'
+    time.sleep(5)
+    req_id = 'cen_2'
+    print('Request: ' + req_id)
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
     rt_metric[req_id] = rt_measurement
     parameters = {'s1': s1, 's2': s2}
@@ -92,7 +97,7 @@ def centralised_composition(s1, s2):
     print('(' + str(s1) + ' + ' + str(s2) + ')^2 = ' + str(square['res']))
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    print(rt_metric)"""
+    print(rt_metric)
 
 
 # A simple example of a doa-based service composition that calculates the square of the addition of two numbers
@@ -102,25 +107,30 @@ def doa_composition(s1, s2):
     consumer_thread.start()
     time.sleep(5)
     req_id = 'doa_1'
+    print('Request: ' + req_id)
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time':0}    
     rt_metric[req_id] = rt_measurement
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'user.response'}
     message_json = json.dumps(message_dict, indent=4)
+    producer = Producer(credentials)
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer = Producer(credentials)
     producer.publish(home_service_async['topic'], message_json)
 
-    """message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
+    time.sleep(5)
+    req_id = 'doa_2'
+    print('Request: ' + req_id)
+    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
+    rt_metric[req_id] = rt_measurement
+    message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'service.square',
-                    'parameters': [{'name': 's1', 'value': s1},{'name': 's2', 'value': s2}]}
+                    'parameters': [{'name': 's1', 'value': s1}, {'name': 's2', 'value': s2}]}
     message_json = json.dumps(message_dict, indent=4)
     producer = Producer(credentials)
-    req_id = 'doa_2'
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(home_service_async['topic'], message_json)"""
+    producer.publish(home_service_async['topic'], message_json)
 
 
 time.sleep(10)

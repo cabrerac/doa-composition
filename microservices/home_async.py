@@ -3,14 +3,12 @@ import logic.util as util
 import logic.home_function as logic
 from clients.producer import Producer
 from clients.consumer import Consumer
-import threading
 import json
 
 
 rabbit_credentials_file = 'rabbit-mq.yaml'
 
 
-#def start_consumer(credentials):
 def callback(ch, method, properties, body):
     #ch.close()
     message = json.loads(body)

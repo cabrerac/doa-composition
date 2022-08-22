@@ -1,10 +1,12 @@
+from flask import Flask, make_response, request
 import logic.util as util
 import logic.add_function as logic
 from clients.producer import Producer
 from clients.consumer import Consumer
 import json
 
-credentials = util.read_rabbit_credentials('rabbit-mq.yaml')
+
+rabbit_credentials_file = 'rabbit-mq.yaml'
 
 
 def callback(ch, method, properties, body):
@@ -27,8 +29,30 @@ def callback(ch, method, properties, body):
         ]
     }
     message_json = json.dumps(message_dict, indent=4)
+    credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     producer = Producer(credentials)
     producer.publish(next_topic, message_json)
 
 
-consumer = Consumer(credentials, 'service.add', callback)
+credentials = util.read_rabbit_credentials(rabbit_credentials_file)
+consumer_thread = Consumer(credentials, 'service.add', callback)
+consumer_thread.start()
+
+
+# Flask interface
+app = Flask('__name__')
+
+
+@app.route('/doa_composition/add_async', methods=['GET', 'POST'])
+def add():
+    try:
+        parameters = request.get_json()
+        a = parameters['s1']
+        b = parameters['s2']
+        return make_response({'res': logic.add_function(a, b)})
+    except:
+        return make_response({'res': 'Service exception!!!'})
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
