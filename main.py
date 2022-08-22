@@ -23,7 +23,7 @@ home_service_sync = {
 
 home_service_async = {
     'name': 'home-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 2, 'count': 1, 'topic': 'service.home'
+    'path': '/doa_composition/home_async', 'priority': 2, 'count': 1, 'topic': 'service.home'
 }
 
 add_service_sync = {
@@ -80,7 +80,7 @@ def centralised_composition(s1, s2):
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
 
-    req_id = 'cen_2'
+    """req_id = 'cen_2'
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
     rt_metric[req_id] = rt_measurement
     parameters = {'s1': s1, 's2': s2}
@@ -90,7 +90,7 @@ def centralised_composition(s1, s2):
     print('(' + str(s1) + ' + ' + str(s2) + ')^2 = ' + str(square['res']))
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    print(rt_metric)
+    print(rt_metric)"""
 
 
 # A simple example of a doa-based service composition that calculates the square of the addition of two numbers
@@ -98,6 +98,7 @@ def doa_composition(s1, s2):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     consumer_thread = threading.Thread(target=start_consumer(credentials))
     consumer_thread.start()
+    print('after thread start')
     req_id = 'doa_1'
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'user.response'}
@@ -107,7 +108,6 @@ def doa_composition(s1, s2):
     producer = Producer(credentials)
     producer.publish(home_service_async['topic'], message_json)
 
-    req_id = 'doa_2'
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'service.square',
                     'parameters': [{'name': 's1', 'value': s1},{'name': 's2', 'value': s2}]}
