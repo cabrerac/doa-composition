@@ -17,7 +17,7 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/home_async.py .
+COPY microservices/square_async.py .
 
 # Create logic directory
 RUN mkdir ./logic
@@ -26,7 +26,7 @@ RUN mkdir ./logic
 COPY microservices/logic/util.py ./logic/
 
 # Copy the function code to the working directory
-COPY microservices/logic/home_function.py ./logic/
+COPY microservices/logic/square_function.py ./logic/
 
 # Create clients directory
 RUN mkdir ./clients
@@ -36,4 +36,4 @@ COPY clients/consumer.py ./clients/
 COPY clients/producer.py ./clients/
 
 # Specify the command to run on container start
-CMD ["python", "-u", "./home_async.py"]
+CMD ["python", "-u", "./square_async.py"]

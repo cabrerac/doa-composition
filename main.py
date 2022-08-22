@@ -32,7 +32,7 @@ add_service_sync = {
 }
 
 add_service_async = {
-    'name': 'add-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
+    'name': 'add-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
     'path': '/doa_composition/add_async', 'priority': 4, 'count': 1, 'topic': 'service.add'
 }
 
@@ -42,7 +42,7 @@ square_service_sync = {
 }
 
 square_service_async = {
-    'name': 'square-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
+    'name': 'square-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
     'path': '/doa_composition/square_async', 'priority': 6, 'count': 1, 'topic': 'service.square'
 }
 
@@ -63,7 +63,7 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     res = message['res']
     req_id = message['req_id']
-    print('Response DOA: ' + res)
+    print('Response DOA: ' + str(res))
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
     print(rt_metric)
@@ -81,7 +81,7 @@ def centralised_composition(s1, s2):
     rt_metric[req_id] = rt_measurement
     parameters = {}
     home = client.make_request(external_url, home_service_sync['path'], parameters)
-    print('Response Centralised:' + home['res'])
+    print('Response Centralised: ' + home['res'])
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
 
@@ -94,14 +94,14 @@ def centralised_composition(s1, s2):
     addition = client.make_request(external_url, add_service_sync['path'], parameters)
     parameters = {'p': addition['res']}
     square = client.make_request(external_url, square_service_sync['path'], parameters)
-    print('(' + str(s1) + ' + ' + str(s2) + ')^2 = ' + str(square['res']))
+    print('Response Centralised: ' + home['res'])
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
     print(rt_metric)
 
 
 # A simple example of a doa-based service composition that calculates the square of the addition of two numbers
-def doa_composition(s1, s2):
+def doa_composition(a, b):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     consumer_thread = Consumer(credentials, 'user.response', callback)
     consumer_thread.start()
@@ -112,11 +112,10 @@ def doa_composition(s1, s2):
     rt_metric[req_id] = rt_measurement
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'user.response'}
-    message_json = json.dumps(message_dict, indent=4)
     producer = Producer(credentials)
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(home_service_async['topic'], message_json)
+    producer.publish(home_service_async['topic'], message_dict)
 
     time.sleep(5)
     req_id = 'doa_2'
@@ -125,12 +124,11 @@ def doa_composition(s1, s2):
     rt_metric[req_id] = rt_measurement
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'service.square',
-                    'parameters': [{'name': 's1', 'value': s1}, {'name': 's2', 'value': s2}]}
-    message_json = json.dumps(message_dict, indent=4)
+                    'parameters': [{'name': 'a', 'value': a}, {'name': 'b', 'value': b}]}
     producer = Producer(credentials)
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(home_service_async['topic'], message_json)
+    producer.publish(add_service_async['topic'], message_dict)
 
 
 time.sleep(10)

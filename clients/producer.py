@@ -1,5 +1,6 @@
 import pika
 import ssl
+import json
 
 
 class Producer:
@@ -18,6 +19,7 @@ class Producer:
         self.channel.exchange_declare(exchange='messages', exchange_type='topic', durable=True)
 
     def publish(self, routing_key, body):
-        self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body)
-        print(" [x] Sent to " + routing_key + " Message: " + body)
+        body_json = json.dumps(body, indent=4)
+        self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body_json)
+        print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
         self.connection.close()

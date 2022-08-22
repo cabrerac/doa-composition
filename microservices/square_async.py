@@ -22,10 +22,9 @@ def callback(ch, method, properties, body):
         'req_id': req_id, 'user_topic': 'user.response', 'desc': 'message from square!!!',
         'next_topic': 'user.response', 'res': logic.square_function(p)
     }
-    message_json = json.dumps(message_dict, indent=4)
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     producer = Producer(credentials)
-    producer.publish(next_topic, message_json)
+    producer.publish(next_topic, message_dict)
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)

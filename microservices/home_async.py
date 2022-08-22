@@ -10,7 +10,6 @@ rabbit_credentials_file = 'rabbit-mq.yaml'
 
 
 def callback(ch, method, properties, body):
-    #ch.close()
     message = json.loads(body)
     req_id = message['req_id']
     next_topic = message['next_topic']
@@ -19,14 +18,9 @@ def callback(ch, method, properties, body):
         'next_topic': 'user.response',
         'res': logic.home_function()
     }
-    message_json = json.dumps(message_dict, indent=4)
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     producer = Producer(credentials)
-    producer.publish(next_topic, message_json)
-    #credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-    #consumer_thread = Consumer(credentials, 'service.home', callback)
-    #consumer_thread.start()
-    #consumer = Consumer(credentials, 'user.response', callback)
+    producer.publish(next_topic, message_dict)
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
@@ -45,20 +39,3 @@ def home():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-"""def callback(ch, method, properties, body):
-    time.sleep(5)
-    message = json.loads(body)
-    req_id = message['req_id']
-    next_topic = message['next_topic']
-    message_dict = {
-        'req_id': req_id, 'user_topic': 'user.response', 'desc': 'response from home!!!', 'next_topic': 'user.response',
-        'res': logic.home_function()
-    }
-    message_json = json.dumps(message_dict, indent=4)
-    producer = Producer(credentials)
-    producer.publish(next_topic, message_json)
-
-
-consumer = Consumer(credentials, 'service.home', callback)
-"""

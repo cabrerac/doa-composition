@@ -28,10 +28,9 @@ def callback(ch, method, properties, body):
             {'name': 'p', 'value': p}
         ]
     }
-    message_json = json.dumps(message_dict, indent=4)
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     producer = Producer(credentials)
-    producer.publish(next_topic, message_json)
+    producer.publish(next_topic, message_dict)
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
