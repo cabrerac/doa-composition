@@ -57,16 +57,18 @@ print('Load Balancer URL: ' + external_url)
 print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
 
-def start_consumer(credentials):
-    def callback(ch, method, properties, body):
-        message = json.loads(body)
-        res = message['res']
-        req_id = message['req_id']
-        print('Response: ' + res)
-        rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-        rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-        print(rt_metric)
-    consumer = Consumer(credentials, 'user.response', callback)
+def callback(ch, method, properties, body):
+    #ch.close()
+    message = json.loads(body)
+    res = message['res']
+    req_id = message['req_id']
+    print('Response DOA: ' + res)
+    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
+    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
+    print(rt_metric)
+    #credentials = util.read_rabbit_credentials(rabbit_credentials_file)
+    #consumer_thread = Consumer(credentials, 'user.response', callback)
+    #consumer_thread.start()
 
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
@@ -76,7 +78,7 @@ def centralised_composition(s1, s2):
     rt_metric[req_id] = rt_measurement
     parameters = {}
     home = client.make_request(external_url, home_service_sync['path'], parameters)
-    print(home['res'])
+    print('Response Centralised:' + home['res'])
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
 
@@ -96,10 +98,12 @@ def centralised_composition(s1, s2):
 # A simple example of a doa-based service composition that calculates the square of the addition of two numbers
 def doa_composition(s1, s2):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-    consumer_thread = threading.Thread(target=start_consumer(credentials))
+    consumer_thread = Consumer(credentials, 'user.response', callback)
     consumer_thread.start()
-    print('after thread start')
+    time.sleep(5)
     req_id = 'doa_1'
+    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time':0}    
+    rt_metric[req_id] = rt_measurement
     message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'user.response'}
     message_json = json.dumps(message_dict, indent=4)
@@ -108,7 +112,7 @@ def doa_composition(s1, s2):
     producer = Producer(credentials)
     producer.publish(home_service_async['topic'], message_json)
 
-    message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
+    """message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
                     'next_topic': 'service.square',
                     'parameters': [{'name': 's1', 'value': s1},{'name': 's2', 'value': s2}]}
     message_json = json.dumps(message_dict, indent=4)
@@ -116,7 +120,7 @@ def doa_composition(s1, s2):
     req_id = 'doa_2'
     rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
     rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(home_service_async['topic'], message_json)
+    producer.publish(home_service_async['topic'], message_json)"""
 
 
 time.sleep(10)

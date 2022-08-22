@@ -19,5 +19,5 @@ class Producer:
 
     def publish(self, routing_key, body):
         self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body)
-        print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
+        print(" [x] Sent to " + routing_key + " Message: " + body)
         self.connection.close()
