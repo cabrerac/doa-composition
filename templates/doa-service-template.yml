@@ -47,10 +47,6 @@ Parameters:
     Default: ""
     Description: (Optional) An IAM role to give the service's containers if the code within needs to
                  access other AWS resources like S3 buckets, DynamoDB tables, etc
-  TargetType:
-    Type: String
-    Default: "ip"
-    Description: Target type of the deployed service
 
 #Conditions:
 #  HasCustomRole: !Not [ !Equals [!Ref 'Role', ''] ]
@@ -124,16 +120,16 @@ Resources:
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckIntervalSeconds: 15
+      HealthCheckIntervalSeconds: 6
       HealthCheckPath: !Ref 'Path'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
-      TargetType: !Ref 'TargetType'
+      TargetType: ip
       Name: !Ref 'ServiceName'
       Port: !Ref 'ContainerPort'
       Protocol: HTTP
-      UnhealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
       VpcId:
         Fn::ImportValue:
             !Join [':', ['doa-resources', 'VPCId']]

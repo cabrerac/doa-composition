@@ -18,35 +18,35 @@ print('0. Defining services...')
 
 home_service_sync = {
     'name': 'home-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 1, 'count': 1, 'targetType': 'ip'
+    'path': '/doa_composition/home', 'priority': 1, 'count': 1
 }
 
 home_service_async = {
     'name': 'home-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 2, 'count': 1, 'targetType': 'instance', 'topic': 'service.home'
+    'path': '/doa_composition/home', 'priority': 2, 'count': 1, 'topic': 'service.home'
 }
 
 add_service_sync = {
     'name': 'add-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/add', 'priority': 3, 'count': 1, 'targetType': 'ip'
+    'path': '/doa_composition/add', 'priority': 3, 'count': 1
 }
 
 add_service_async = {
     'name': 'add-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 4, 'count': 1, 'targetType': 'instance', 'topic': 'service.add'
+    'path': '/doa_composition/home', 'priority': 4, 'count': 1, 'topic': 'service.add'
 }
 
 square_service_sync = {
     'name': 'square-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/square', 'priority': 5, 'count': 1, 'targetType': 'ip'
+    'path': '/doa_composition/square', 'priority': 5, 'count': 1
 }
 
 square_service_async = {
     'name': 'square-service-async', 'imageUrl': '', 'port': 80, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 6, 'count': 1, 'targetType': 'instance', 'topic': 'service.square'
+    'path': '/doa_composition/home', 'priority': 6, 'count': 1, 'topic': 'service.square'
 }
 
-services = [home_service_sync, home_service_async, add_service_sync, square_service_sync]
+services = [home_service_sync, home_service_async]
 
 # Deploying AWS resources and services
 print('1. Deploying services...')
