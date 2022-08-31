@@ -1,12 +1,10 @@
-import threading
-
 from deployment import deploy_to_aws
 from clients import client
 import time
-import json
 import microservices.logic.util as util
 from clients.producer import Producer
 from clients.consumer import Consumer
+
 
 # Approach
 approaches = ['centralised', 'doa']
