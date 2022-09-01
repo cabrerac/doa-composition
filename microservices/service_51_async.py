@@ -14,12 +14,12 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     user_topic = message['user_topic']
     expected_output = message['expected_output']
-    ms = 0.0054
+    ms = 0.0019
     time.sleep(ms)
     message_dict = {
-        'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_51', 'next_topic': 'service._OUTPUT_SERVICE_51',
+        'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_51_async', 'next_topic': 'service._OUTPUT_SERVICE_51',
         'parameters': [
-            {'name': 'p', 'value': 'Response from service_51'}
+            {'name': 'p', 'value': 'Response from service_51_async'}
         ]
     }
     next_topic = message_dict['next_topic']
@@ -39,8 +39,8 @@ consumer_thread.start()
 app = Flask('__name__')
 
 
-@app.route('/doa_composition/service_51', methods=['GET', 'POST'])
-def service_51():
+@app.route('/doa_composition/service_51_async', methods=['GET', 'POST'])
+def service_51_async():
     try:
         return make_response({'res': ""})
     except:

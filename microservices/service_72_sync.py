@@ -5,13 +5,13 @@ import time
 app = Flask('__name__')
 
 
-@app.route('/doa_composition/service_72', methods=['GET', 'POST'])
-def service_72():
+@app.route('/doa_composition/service_72_sync', methods=['GET', 'POST'])
+def service_72_sync():
     try:
         parameters = request.get_json()
-        ms = 0.0039
+        ms = 0.0042
         time.sleep(ms)
-        return make_response({'res': 'Response from service_72'})
+        return make_response({'res': 'Response from service_72_sync'})
     except:
         return make_response({'res': 'Service exception!!!'})
 
