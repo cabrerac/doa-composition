@@ -15,6 +15,7 @@ BASE_ECR_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
 ECR_NAME = 'doa-composition'
 
 
+# deploys infrastructure resoures in AWS
 def deploy_resources(resources_template_path, rabbitmq_credentials_path):
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
@@ -43,6 +44,7 @@ def deploy_resources(resources_template_path, rabbitmq_credentials_path):
     return external_url, rabbitmq_url
 
 
+# removes infrastructure resources in AWS
 def remove_resources():
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
@@ -55,7 +57,7 @@ def remove_resources():
     _remove_stack(cloud_client, 'doa-resources')
 
 
-# deploy services on AWS.
+# deploys services in AWS
 def deploy_services(service_template_path, services):
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
@@ -68,7 +70,7 @@ def deploy_services(service_template_path, services):
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
-        shutil.copyfile('./dockers/' + service['name'], './Dockerfile')
+        shutil.copyfile('./dockers/' + service['name'].replace('_', '-'), './Dockerfile')
         # pushing image for service
         service = _push_docker_image('.', service, aws_credentials)
         # reading service template
@@ -80,6 +82,7 @@ def deploy_services(service_template_path, services):
         os.remove(service_path)
 
 
+# removes services from AWS
 def remove_services(services):
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
@@ -90,10 +93,10 @@ def remove_services(services):
     cloud_client = boto3.client('cloudformation', aws_access_key_id=access_key_id,
                                 aws_secret_access_key=secret_access_key, region_name=aws_region)
     for service in services:
-        _remove_stack(cloud_client, service['name'] + '-stack')
+        _remove_stack(cloud_client, service['name'].replace('_', '-') + '-stack')
 
 
-# read aws credentials from file or environment variables
+# reads aws credentials from file or environment variables
 def _read_aws_credentials(filename):
     try:
         with open(filename) as json_data:
@@ -122,11 +125,11 @@ def _read_aws_credentials(filename):
 def _create_service_template(service_template_path, service):
     with open(service_template_path, 'r') as stream:
         service_template = load_yaml(stream)
-        stack_name = service['name'] + '-stack'
+        stack_name = service['name'].replace('_','-') + '-stack'
         # customising service template
         service_template['Description'] = 'Deploy service ' + service['name'] + ' on AWS Fargate, hosted in a private subnet, but accessible via a public balancer'
         service_template['Parameters']['StackName']['Default'] = stack_name
-        service_template['Parameters']['ServiceName']['Default'] = service['name']
+        service_template['Parameters']['ServiceName']['Default'] = service['name'].replace('_','')
         service_template['Parameters']['ImageUrl']['Default'] = service['imageUrl']
         service_template['Parameters']['ContainerPort']['Default'] = service['port']
         service_template['Parameters']['ContainerCpu']['Default'] = service['cpu']
@@ -186,6 +189,7 @@ def _create_stack(cloud_client, template_body, stack_name):
     return res
 
 
+# removes stack from AWS
 def _remove_stack(cloud_client, stack_name):
     try:
         exists, stack_id = _stack_exists(cloud_client, stack_name)
@@ -209,6 +213,7 @@ def _stack_exists(cloud_client, stack_name):
     return False, -1
 
 
+# json serialiser
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
     if isinstance(obj, datetime):
@@ -217,7 +222,7 @@ def json_serial(obj):
     raise TypeError("Type not serializable")
 
 
-# build docker image and push the image to AWS ECR
+# builds docker image and push the image to AWS ECR
 def _push_docker_image(path, service, aws_credentials):
     service_tag = service['name']
     service_name = service['name']
@@ -257,7 +262,7 @@ def _push_docker_image(path, service, aws_credentials):
     return service
 
 
-# update rabbitmq credentials file with the url of the created broker
+# updates rabbitmq credentials file with the url of the created broker
 def _update_rabbitmq_credentials(rabbitmq_url, rabbitmq_credentials_path):
     with open(rabbitmq_credentials_path, 'r') as stream:
         rabbitmq_credentials = load_yaml(stream)
