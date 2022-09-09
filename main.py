@@ -1,137 +1,175 @@
-import threading
+import time
+import json
+import random
+import os
 
 from deployment import deploy_to_aws
 from clients import client
-import time
-import json
+from registry import data_access
 import microservices.logic.util as util
 from clients.producer import Producer
 from clients.consumer import Consumer
+from baselines import backward_planning
+from baselines import conversations
 
-# Approach
-approaches = ['centralised', 'doa']
+
+# Experimental setup
+approaches = ['doa']
+lengths = [1]
+services_number = 100
+requests_number = 10
+metrics = {}
 rabbit_credentials_file = 'rabbit-mq.yaml'
-rt_metric = {}
-
-# Defining services to register and create in the AWS infrastructure
-print('0. Defining services...')
-
-home_service_sync = {
-    'name': 'home-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home', 'priority': 1, 'count': 1
-}
-
-home_service_async = {
-    'name': 'home-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/home_async', 'priority': 2, 'count': 1, 'topic': 'service.home'
-}
-
-add_service_sync = {
-    'name': 'add-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/add', 'priority': 3, 'count': 1
-}
-
-add_service_async = {
-    'name': 'add-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/add_async', 'priority': 4, 'count': 1, 'topic': 'service.add'
-}
-
-square_service_sync = {
-    'name': 'square-service-sync', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/square', 'priority': 5, 'count': 1
-}
-
-square_service_async = {
-    'name': 'square-service-async', 'imageUrl': '', 'port': 5000, 'cpu': 256, 'memory': 512,
-    'path': '/doa_composition/square_async', 'priority': 6, 'count': 1, 'topic': 'service.square'
-}
-
-services = [home_service_sync, home_service_async, add_service_sync, add_service_async, square_service_sync,
-            square_service_async]
-
-# Deploying AWS resources and services
-print('1. Deploying services...')
-external_url, rabbitmq_url = deploy_to_aws.deploy_services('templates/doa-resources-template.yml',
-                                                           'templates/doa-service-template.yml',
-                                                           './rabbit-mq.yaml', services)
-print('Load Balancer URL: ' + external_url)
-print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
 
+# Write results file
+def save(file_name, results, fmt):
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
+    with open(file_name, 'a', newline='', encoding=fmt) as f:
+        results.to_csv(f, encoding=fmt, index=False, header=f.tell() == 0)
+
+
+# Defining services to register and deploy in the AWS infrastructure
+def get_services(service_type):
+    services = []
+    i = 1
+    while i <= services_number:
+        file = open('./descriptions/services/service_'+str(i)+'.json')
+        service = json.load(file)
+        service['name'] = service['name'] + service_type
+        service['imageUrl'] = ''
+        service['port'] = 5000
+        service['cpu'] = 256
+        service['memory'] = 512
+        service['path'] = 'doa_composition/' + service['name']
+        service['priority'] = i
+        service['count'] = 1
+        services.append(service)
+        i = i + 1
+    return services
+
+
+# Get service request
+def get_request(approach, length):
+    path = './descriptions/requests/' + approach + '/' + str(length)
+    request = random.choice(os.listdir(path))
+    return request
+
+
+# Callback function for the doa-based composition
 def callback(ch, method, properties, body):
     message = json.loads(body)
     res = message['res']
     req_id = message['req_id']
     print('Response DOA: ' + str(res))
-    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    print(rt_metric)
-
-
-# A simple example of a centralised service composition that calculates the square of the addition of two numbers
-def centralised_composition(s1, s2):
-    time.sleep(5)
-    req_id = 'cen_1'
-    print('Request: ' + req_id)
-    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    rt_metric[req_id] = rt_measurement
-    parameters = {}
-    home = client.make_request(external_url, home_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-
-    time.sleep(5)
-    req_id = 'cen_2'
-    print('Request: ' + req_id)
-    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    rt_metric[req_id] = rt_measurement
-    parameters = {'s1': s1, 's2': s2}
-    addition = client.make_request(external_url, add_service_sync['path'], parameters)
-    parameters = {'p': addition['res']}
-    square = client.make_request(external_url, square_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    print(rt_metric)
+    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
+    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
+    save('results.csv', metrics, 'utf-8')
+    print(metrics)
 
 
 # A simple example of a doa-based service composition that calculates the square of the addition of two numbers
-def doa_composition(a, b):
+def doa_composition(request):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     consumer_thread = Consumer(credentials, 'user.response', callback)
     consumer_thread.start()
     time.sleep(5)
-    req_id = 'doa_1'
+    req_id = 'doa_' + len(metrics)
     print('Request: ' + req_id)
-    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time':0}    
-    rt_metric[req_id] = rt_measurement
-    message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
-                    'next_topic': 'user.response'}
+    topic = 'service.' + request['inputs'][0]['name']
+    expected_output = request['outputs'][0]['name']
+    message_dict = {'req_id': req_id, 'expected_output': expected_output, 'user_topic': 'user.response',
+                    'desc': 'request from main!!!'}
     producer = Producer(credentials)
-    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(home_service_async['topic'], message_dict)
+    measurement = {'id': req_id, 'approach': 'doa','request_time': int(round(time.time() * 1000)),
+                   'response_time': int(round(time.time() * 1000)), 'total_time': 0}
+    metrics[req_id] = measurement
+    producer.publish(topic, message_dict)
 
-    time.sleep(5)
-    req_id = 'doa_2'
-    print('Request: ' + req_id)
+
+# A simple example of a centralised service composition that calculates the square of the addition of two numbers
+def conversation_composition(external_url, request):
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    rt_metric[req_id] = rt_measurement
-    message_dict = {'req_id': req_id, 'user_topic': 'user.response', 'desc': 'request from main!!!',
-                    'next_topic': 'service.square',
-                    'parameters': [{'name': 'a', 'value': a}, {'name': 'b', 'value': b}]}
-    producer = Producer(credentials)
-    rt_metric[req_id]['response_time'] = int(round(time.time() * 1000))
-    rt_metric[req_id]['total_time'] = rt_metric[req_id]['response_time'] - rt_metric[req_id]['request_time']
-    producer.publish(add_service_async['topic'], message_dict)
+    metrics[request['id']] = rt_measurement
+    plan = conversations.create_plan(request)
+    tasks = plan['task']
+    index = 1
+    parameters = {'inputs': request['inputs']}
+    while index <= len(tasks):
+        task = tasks[index]
+        service = task['services'][0]
+        request = client.make_request(external_url, service['path'], parameters)
+        parameters['inputs'] = request['outputs']
+        index = index - 1
+    metrics[request['id']]['response_time'] = int(round(time.time() * 1000))
+    metrics[request['id']]['total_time'] = metrics[request['id']]['response_time'] - metrics[request['id']]['request_time']
+    save('results.csv', metrics, 'utf-8')
 
 
-time.sleep(10)
-print('2. Executing compositions...')
-for approach in approaches:
-    print('### ' + approach + ' Approach ###')
-    if approach == 'centralised':
-        centralised_composition(4, 5)
-    if approach == 'doa':
-        doa_composition(4, 5)
+# A simple example of a centralised service composition that calculates the square of the addition of two numbers
+def planning_composition(external_url, request):
+    time.sleep(5)
+    plan = backward_planning.create_plan(request)
+    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
+    metrics[request['id']] = rt_measurement
+    services = plan['services']
+    index = len(services)
+    parameters = {'inputs': request['inputs']}
+    while index >= 1:
+        service = services[index]
+        request = client.make_request(external_url, service['path'], parameters)
+        parameters['inputs'] = request['outputs']
+        index = index - 1
+    metrics[request['id']]['response_time'] = int(round(time.time() * 1000))
+    metrics[request['id']]['total_time'] = metrics[request['id']]['response_time'] - metrics[request['id']]['request_time']
+    save('results.csv', metrics, 'utf-8')
+
+
+# Main program that runs experiments
+def main():
+    # Deploying AWS resources
+    print('0. Deploying resources...')
+    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml',
+                                                                './rabbit-mq.yaml')
+    print('Load Balancer URL: ' + external_url)
+    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    print('1. Executing experiments...')
+    for approach in approaches:
+        print('### ' + approach + ' Approach ###')
+
+        # Deploying services on top of AWS resources
+        if approach == 'doa':
+            services = get_services('async')
+        if approach == 'conversation' or approach == 'planning':
+            services = get_services('sync')
+            data_access.insert_services(services)
+
+        print('2. Deploying services...')
+        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services)
+
+        print('3. Requesting services...')
+        time.sleep(10)
+        for length in lengths:
+            i = 1
+            while i <= requests_number:
+                request = get_request(approach, length)
+                if approach == 'doa':
+                    doa_composition(request)
+                if approach == 'conversation':
+                    conversation_composition(external_url, request)
+                if approach == 'planning':
+                    planning_composition(external_url, request)
+                i = i + 1
+
+        # Removing services from AWS
+        print('4. Removing services...')
+        deploy_to_aws.remove_services('templates/doa-service-template.yml', services)
+        if approach == 'conversation' or approach == 'planning':
+            data_access.remove_services(services)
+    # Removing AWS resources
+    time.sleep(300)
+    print('5. Removing resources...')
+    deploy_to_aws.remove_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
+
+
+main()

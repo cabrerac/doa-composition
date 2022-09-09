@@ -15,8 +15,7 @@ BASE_ECR_URL = '288687564189.dkr.ecr.eu-west-2.amazonaws.com/'
 ECR_NAME = 'doa-composition'
 
 
-# deploy resources and services on AWS.
-def deploy_services(resources_template_path, service_template_path, rabbitmq_credentials_path, services):
+def deploy_resources(resources_template_path, rabbitmq_credentials_path):
     # reading aws credentials
     aws_credentials = _read_aws_credentials('')
     access_key_id = aws_credentials['access_key_id']
@@ -41,6 +40,31 @@ def deploy_services(resources_template_path, service_template_path, rabbitmq_cre
                 if output['OutputKey'] == 'AmqpEndpoints':
                     rabbitmq_url = output['OutputValue']
     _update_rabbitmq_credentials(rabbitmq_url, rabbitmq_credentials_path)
+    return external_url, rabbitmq_url
+
+
+def remove_resources():
+    # reading aws credentials
+    aws_credentials = _read_aws_credentials('')
+    access_key_id = aws_credentials['access_key_id']
+    secret_access_key = aws_credentials['secret_access_key']
+    aws_region = aws_credentials['region']
+    # creating cloud formation client
+    cloud_client = boto3.client('cloudformation', aws_access_key_id=access_key_id,
+                                aws_secret_access_key=secret_access_key, region_name=aws_region)
+    _remove_stack(cloud_client, 'doa-resources')
+
+
+# deploy services on AWS.
+def deploy_services(service_template_path, services):
+    # reading aws credentials
+    aws_credentials = _read_aws_credentials('')
+    access_key_id = aws_credentials['access_key_id']
+    secret_access_key = aws_credentials['secret_access_key']
+    aws_region = aws_credentials['region']
+    # creating cloud formation client
+    cloud_client = boto3.client('cloudformation', aws_access_key_id=access_key_id,
+                                aws_secret_access_key=secret_access_key, region_name=aws_region)
     # for each service push image and create stack
     for service in services:
         print('Creating stack for service ' + service['name'] + '...')
@@ -54,7 +78,19 @@ def deploy_services(resources_template_path, service_template_path, rabbitmq_cre
         res = _create_stack(cloud_client, service_template, stack_name)
         print('Stack created for service ' + service['name'] + '...')
         os.remove(service_path)
-    return external_url, rabbitmq_url
+
+
+def remove_services(services):
+    # reading aws credentials
+    aws_credentials = _read_aws_credentials('')
+    access_key_id = aws_credentials['access_key_id']
+    secret_access_key = aws_credentials['secret_access_key']
+    aws_region = aws_credentials['region']
+    # creating cloud formation client
+    cloud_client = boto3.client('cloudformation', aws_access_key_id=access_key_id,
+                                aws_secret_access_key=secret_access_key, region_name=aws_region)
+    for service in services:
+        _remove_stack(cloud_client, service['name'] + '-stack')
 
 
 # read aws credentials from file or environment variables
@@ -148,6 +184,18 @@ def _create_stack(cloud_client, template_body, stack_name):
     else:
         res = cloud_client.describe_stacks(StackName=stack_result['StackId'])
     return res
+
+
+def _remove_stack(cloud_client, stack_name):
+    try:
+        exists, stack_id = _stack_exists(cloud_client, stack_name)
+        if exists:
+            print('Deleting stack ' + stack_name + '...')
+            cloud_client.delete_stack(StackName=stack_name)
+        else:
+            print('Stack ' + stack_name + ' does not exist...')
+    except:
+        print('Exception removing stack: ' + stack_name + '...')
 
 
 # validate if stack exists in AWS
