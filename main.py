@@ -9,6 +9,8 @@ from registry import data_access
 import microservices.logic.util as util
 from clients.producer import Producer
 from clients.consumer import Consumer
+from baselines import backward_planning
+from baselines import conversations
 
 
 # Experimental setup
@@ -87,60 +89,43 @@ def doa_composition(request):
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
 def conversation_composition(external_url, request):
-    time.sleep(5)
-    """req_id = 'cen_1'
-    print('Request: ' + req_id)
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    metrics[req_id] = rt_measurement
-    parameters = {}
-    home = client.make_request(external_url, home_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
-    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-
-    time.sleep(5)
-    req_id = 'cen_2'
-    print('Request: ' + req_id)
-    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    metrics[req_id] = rt_measurement
-    parameters = {'s1': s1, 's2': s2}
-    addition = client.make_request(external_url, add_service_sync['path'], parameters)
-    parameters = {'p': addition['res']}
-    square = client.make_request(external_url, square_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
-    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-    print(metrics)"""
+    metrics[request['id']] = rt_measurement
+    plan = conversations.create_plan(request)
+    tasks = plan['task']
+    index = 1
+    parameters = {'inputs': request['inputs']}
+    while index <= len(tasks):
+        task = tasks[index]
+        service = task['services'][0]
+        request = client.make_request(external_url, service['path'], parameters)
+        parameters['inputs'] = request['outputs']
+        index = index - 1
+    metrics[request['id']]['response_time'] = int(round(time.time() * 1000))
+    metrics[request['id']]['total_time'] = metrics[request['id']]['response_time'] - metrics[request['id']]['request_time']
+    save('results.csv', metrics, 'utf-8')
 
 
 # A simple example of a centralised service composition that calculates the square of the addition of two numbers
 def planning_composition(external_url, request):
     time.sleep(5)
-    """req_id = 'cen_1'
-    print('Request: ' + req_id)
+    plan = backward_planning.create_plan(request)
     rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    metrics[req_id] = rt_measurement
-    parameters = {}
-    home = client.make_request(external_url, home_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
-    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-
-    time.sleep(5)
-    req_id = 'cen_2'
-    print('Request: ' + req_id)
-    rt_measurement = {'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'total_time': 0}
-    metrics[req_id] = rt_measurement
-    parameters = {'s1': s1, 's2': s2}
-    addition = client.make_request(external_url, add_service_sync['path'], parameters)
-    parameters = {'p': addition['res']}
-    square = client.make_request(external_url, square_service_sync['path'], parameters)
-    print('Response Centralised: ' + home['res'])
-    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
-    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-    print(metrics)"""
+    metrics[request['id']] = rt_measurement
+    services = plan['services']
+    index = len(services)
+    parameters = {'inputs': request['inputs']}
+    while index >= 1:
+        service = services[index]
+        request = client.make_request(external_url, service['path'], parameters)
+        parameters['inputs'] = request['outputs']
+        index = index - 1
+    metrics[request['id']]['response_time'] = int(round(time.time() * 1000))
+    metrics[request['id']]['total_time'] = metrics[request['id']]['response_time'] - metrics[request['id']]['request_time']
+    save('results.csv', metrics, 'utf-8')
 
 
+# Main program that runs experiments
 def main():
     # Deploying AWS resources
     print('0. Deploying resources...')

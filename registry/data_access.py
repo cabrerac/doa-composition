@@ -18,3 +18,12 @@ def remove_services():
     services_col.drop()
     mongo_client.close()
     return deleted_ids
+
+
+def get_services(query):
+    mongo_client = pymongo.MongoClient('mongodb://localhost:27017/')
+    registry_db = mongo_client['registry']
+    services_col = registry_db['services']
+    services = services_col.find(query)
+    mongo_client.close()
+    return services
