@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "task": 1,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_9",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Output of service"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_8",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Input of service"
+        }
+      ]
+    }
+  ],
+  "name": "request_9_9"
+}
