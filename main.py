@@ -38,6 +38,7 @@ def create_dataset(path, n, r, le):
 # writes results file
 def save(file_name, results, fmt):
     df = pd.DataFrame.from_dict(results)
+    df.drop(columns=['request_time', 'response_time'])
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     with open(file_name, 'w', newline='', encoding=fmt) as f:
         df.to_csv(f, encoding=fmt, index=False, header=f.tell() == 0)
@@ -94,7 +95,7 @@ def rabbit_doa_consumer():
 
 
 # doa based composition approach
-def doa_composition(request, n):
+def doa_composition(request, n, le):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request: ' + req_id + ' ::: ' + request['name'] )
@@ -103,7 +104,7 @@ def doa_composition(request, n):
     message_dict = {'req_id': req_id, 'expected_output': expected_output, 'user_topic': 'user.response',
                     'desc': 'request from main!!!'}
     producer = Producer(credentials)
-    measurement = {'id': req_id, 'services': n, 'approach': 'doa','request_time': int(round(time.time() * 1000)),
+    measurement = {'id': req_id, 'approach': 'doa', 'services': n, 'length', le,'request_time': int(round(time.time() * 1000)),
                    'response_time': int(round(time.time() * 1000)), 'total_time': 0}
     metrics[req_id] = measurement
     producer.publish(topic, message_dict)
