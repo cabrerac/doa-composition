@@ -1,0 +1,55 @@
+{
+  "tasks": [
+    {
+      "task": 1,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_80",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Output of service"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_79",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Input of service"
+        }
+      ]
+    },
+    {
+      "task": 2,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_81",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Output of service"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_80",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Input of service"
+        }
+      ]
+    },
+    {
+      "task": 3,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_82",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Output of service"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_81",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "desc": "Input of service"
+        }
+      ]
+    }
+  ]
+}

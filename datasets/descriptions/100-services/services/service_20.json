@@ -1,0 +1,18 @@
+{
+  "outputs": [
+    {
+      "name": "_OUTPUT_SERVICE_20",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+      "desc": "Output of service"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "_OUTPUT_SERVICE_19",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+      "desc": "Input of service"
+    }
+  ],
+  "name": "service_20",
+  "description": "This is the service 20"
+}
