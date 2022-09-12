@@ -85,12 +85,17 @@ def callback(ch, method, properties, body):
     save(results_file, results, 'utf-8')
 
 
-# doa based composition approach
-def doa_composition(request, n):
+# doa based rabbit consumer
+def rabbit_doa_consumer():
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     consumer_thread = Consumer(credentials, 'user.response', callback)
     consumer_thread.start()
-    time.sleep(5)
+    time.sleep(10)
+
+
+# doa based composition approach
+def doa_composition(request, n):
+    credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request: ' + req_id + ' ::: ' + request['name'] )
     topic = 'service.' + request['inputs'][0]['name']
@@ -183,7 +188,8 @@ def main(parameters_file):
         deploy_to_aws.deploy_services('templates/doa-service-template.yml', services)
 
         print('5. Requesting services...')
-        time.sleep(10)
+        if approach == 'doa':
+            rabbit_doa_consumer()
         for length in lengths:
             i = 1
             while i <= experiment_requests:
