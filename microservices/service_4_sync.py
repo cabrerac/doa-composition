@@ -9,7 +9,7 @@ app = Flask('__name__')
 def service_4_sync():
     try:
         parameters = request.get_json()
-        ms = 0.0087
+        ms = 0.0046
         time.sleep(ms)
         return make_response({'res': 'Response from service_4_sync'})
     except:

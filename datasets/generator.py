@@ -40,16 +40,17 @@ def create_services_requests(n, r, le):
                 last = last - n
             output = './datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/request_' + \
                      str(first) + '_' + str(last) + '.json'
+            name = 'request_' + str(first) + '_' + str(last)
             if not os.path.exists(output):
-                create_goal_request(output, n, first, last)
+                create_goal_request(name, output, n, first, last)
                 output = output.replace('goal', 'conversation')
-                create_conversation_request(output, n, first, last)
+                create_conversation_request(name, output, n, first, last)
                 request = request + 1
         length  = length + 1
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
-def create_goal_request(output, n, first, last):
+def create_goal_request(name, output, n, first, last):
     file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(first) + '.json')
     first_service = json.load(file)
     file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(last) + '.json')
@@ -58,13 +59,14 @@ def create_goal_request(output, n, first, last):
     goal_template = json.load(file)
     goal_template['outputs'] = last_service['outputs']
     goal_template['inputs'] = first_service['inputs']
+    goal_template['name'] = name
     if not os.path.exists(output):
         with open(output, 'w') as f:
             json.dump(goal_template, f, indent=2)
 
 
 # creates request for conversation-based approach
-def create_conversation_request(output, n, first, last):
+def create_conversation_request(name, output, n, first, last):
     current = first
     tasks = []
     t = 1
@@ -90,6 +92,7 @@ def create_conversation_request(output, n, first, last):
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
+    conversation_template['name'] = name
     if not os.path.exists(output):
         with open(output, 'w') as f:
             json.dump(conversation_template, f, indent=2)

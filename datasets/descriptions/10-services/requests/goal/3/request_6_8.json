@@ -12,5 +12,6 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
       "desc": "Input of service"
     }
-  ]
+  ],
+  "name": "request_6_8"
 }
