@@ -2,6 +2,7 @@ import time
 import json
 import random
 import os
+import sys
 
 from deployment import deploy_to_aws
 from clients import client
@@ -15,12 +16,6 @@ from datasets import generator
 
 
 # experimental setup variables
-approaches = ['conversation']
-max_length = 5
-lengths = [1]
-services_number = 10
-requests_number = 5
-experiment_requests = 5
 metrics = {}
 rabbit_credentials_file = 'rabbit-mq.yaml'
 dataset_path = './datasets/descriptions/'
@@ -139,7 +134,18 @@ def planning_composition(external_url, request):
 
 
 # main program that runs experiments
-def main():
+def main(parameters_file):
+
+    # reading parameters file
+    file = open(parameters_file)
+    parameters = json.load(file)
+    approaches = parameters['approaches']
+    max_length = parameters['max_length']
+    lengths = parameters['lengths']
+    services_number = parameters['services_number']
+    requests_number = parameters['requests_number']
+    experiment_requests = parameters['experiment_requests']
+
     # creating dataset for the experiment
     create_dataset(dataset_path, services_number, requests_number, max_length)
 
@@ -186,5 +192,8 @@ def main():
     deploy_to_aws.remove_resources()
 
 
-# runs the main function
-main()
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
+    else:
+        print('Please provide the experiments parameters file path in the correct format...')

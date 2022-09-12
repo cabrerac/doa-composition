@@ -1,0 +1,8 @@
+{
+  "approaches": ["conversation"],
+  "max_length": 5,
+  "lengths": [1],
+  "services_number": 10,
+  "requests_number" = 5,
+  "experiment_requests" = 5
+}
