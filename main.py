@@ -23,9 +23,13 @@ dataset_path = './datasets/descriptions/'
 
 # creates dataset
 def create_dataset(path, n, r, le):
-    if not os.exists(path + str(n) + '-services/'):
+    if not os.path.exists(path + str(n) + '-services/'):
+        print('- Creating services and requests...')
         generator.create_services_requests(n, r, le)
+        print('- Creating services implementations...')
         generator.create_services(n)
+    else:
+        print('- Dataset already exists.')
 
 
 # writes results file
@@ -137,6 +141,7 @@ def planning_composition(external_url, request):
 def main(parameters_file):
 
     # reading parameters file
+    print('0. Reading experiment parameters...')
     file = open(parameters_file)
     parameters = json.load(file)
     approaches = parameters['approaches']
@@ -147,15 +152,16 @@ def main(parameters_file):
     experiment_requests = parameters['experiment_requests']
 
     # creating dataset for the experiment
+    print('1. Creating experiment datasets...')
     create_dataset(dataset_path, services_number, requests_number, max_length)
 
     # deploying AWS resources
-    print('0. Deploying resources...')
+    """print('2. Deploying resources...')
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml',
                                                                 './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
-    print('1. Executing experiments...')
+    print('3. Executing experiments...')
     for approach in approaches:
         print('### ' + approach + ' Approach ###')
         # deploying services on top of AWS resources
@@ -164,10 +170,10 @@ def main(parameters_file):
         if approach == 'conversation' or approach == 'planning':
             services = get_services('sync')
             data_access.insert_services(services)
-        print('2. Deploying services...')
+        print('4. Deploying services...')
         deploy_to_aws.deploy_services('templates/doa-service-template.yml', services)
 
-        print('3. Requesting services...')
+        print('5. Requesting services...')
         time.sleep(10)
         for length in lengths:
             i = 1
@@ -182,14 +188,14 @@ def main(parameters_file):
                 i = i + 1
 
         # removing services from AWS
-        print('4. Removing services...')
+        print('6. Removing services...')
         deploy_to_aws.remove_services(services)
         if approach == 'conversation' or approach == 'planning':
             data_access.remove_services()
     # removing AWS resources
     time.sleep(600)
-    print('5. Removing resources...')
-    deploy_to_aws.remove_resources()
+    print('7. Removing resources...')
+    deploy_to_aws.remove_resources()"""
 
 
 if __name__ == "__main__":

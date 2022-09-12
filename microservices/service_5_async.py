@@ -14,7 +14,7 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     user_topic = message['user_topic']
     expected_output = message['expected_output']
-    ms = 0.0006
+    ms = 0.0093
     time.sleep(ms)
     message_dict = {
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_5_async', 'next_topic': 'service._OUTPUT_SERVICE_5',

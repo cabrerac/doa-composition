@@ -14,7 +14,7 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     user_topic = message['user_topic']
     expected_output = message['expected_output']
-    ms = 0.0087
+    ms = 0.0082
     time.sleep(ms)
     message_dict = {
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_1_async', 'next_topic': 'service._OUTPUT_SERVICE_1',
@@ -31,7 +31,7 @@ def callback(ch, method, properties, body):
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-consumer_thread = Consumer(credentials, 'service._OUTPUT_SERVICE_100', callback)
+consumer_thread = Consumer(credentials, 'service._OUTPUT_SERVICE_10', callback)
 consumer_thread.start()
 
 

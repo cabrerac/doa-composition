@@ -9,6 +9,9 @@ def create_services_requests(n, r, le):
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
     service = 1
+    os.mkdir('./datasets/descriptions/' + str(n) + '-services/')
+    os.mkdir('./datasets/descriptions/' + str(n) + '-services/services')
+    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests')
     while service <= n:
         output = service
         inp = service - 1
@@ -23,8 +26,12 @@ def create_services_requests(n, r, le):
         service = service + 1
 
     # creating r requests of lengths from 1 to le for goal and conversations approaches
+    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/')
+    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/')
     length = 1
     while length <= le:
+        os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/')
+        os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/')
         request = 1
         while request <= r:
             first = random.randint(1, n)
@@ -33,25 +40,12 @@ def create_services_requests(n, r, le):
                 last = last - n
             output = './datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/request_' + \
                      str(first) + '_' + str(last) + '.json'
-            if not os.exists(output):
+            if not os.path.exists(output):
                 create_goal_request(output, n, first, last)
                 output = output.replace('goal', 'conversation')
                 create_conversation_request(output, n, first, last)
                 request = request + 1
-        length = length + 1
-
-    # creating r requests of lengths from 1 to le for conversation approaches
-    length = 1
-    while length <= le:
-        request = 1
-        while request <= r:
-            first = random.randint(1, n)
-            last = first + length - 1
-            if last > n:
-                last = last - n
-
-                request = request + 1
-        length = length + 1
+        length  = length + 1
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
@@ -64,7 +58,7 @@ def create_goal_request(output, n, first, last):
     goal_template = json.load(file)
     goal_template['outputs'] = last_service['outputs']
     goal_template['inputs'] = first_service['inputs']
-    if not os.exists(output):
+    if not os.path.exists(output):
         with open(output, 'w') as f:
             json.dump(goal_template, f, indent=2)
 
@@ -89,10 +83,14 @@ def create_conversation_request(output, n, first, last):
             current = current + 1
             if current > n:
                 current = current - n
-    file = open('./datasets/descriptions/templates/conversation_request_template.json')
+        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
+        current_service = json.load(file)
+        task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
+        tasks.append(task)
+    file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
-    if not os.exists(output):
+    if not os.path.exists(output):
         with open(output, 'w') as f:
             json.dump(conversation_template, f, indent=2)
 
