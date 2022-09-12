@@ -18,6 +18,7 @@ from datasets import generator
 
 # experimental setup variables
 metrics = {}
+results = []
 rabbit_credentials_file = 'rabbit-mq.yaml'
 dataset_path = './datasets/descriptions/'
 results_file = ''
@@ -38,7 +39,7 @@ def create_dataset(path, n, r, le):
 def save(file_name, results, fmt):
     df = pd.DataFrame.from_dict(results)
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
-    with open(file_name, 'a', newline='', encoding=fmt) as f:
+    with open(file_name, 'w', newline='', encoding=fmt) as f:
         df.to_csv(f, encoding=fmt, index=False, header=f.tell() == 0)
 
 
@@ -77,9 +78,11 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
     print('Response DOA request: ' + req_id)
+    print('Description: ' + message['desc'])
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-    save(results_file, metrics, 'utf-8')
+    results.append(metrics[req_id])
+    save(results_file, results, 'utf-8')
 
 
 # doa based composition approach
