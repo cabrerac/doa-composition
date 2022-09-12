@@ -11,15 +11,26 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 from baselines import backward_planning
 from baselines import conversations
+from datasets import generator
 
 
 # experimental setup variables
 approaches = ['conversation']
+max_length = 5
 lengths = [1]
 services_number = 10
-requests_number = 10
+requests_number = 5
+experiment_requests = 5
 metrics = {}
 rabbit_credentials_file = 'rabbit-mq.yaml'
+dataset_path = './datasets/descriptions/'
+
+
+# creates dataset
+def create_dataset(path, n, r, le):
+    if not os.exists(path + str(n) + '-services/'):
+        generator.create_services_requests(n, r, le)
+        generator.create_services(n)
 
 
 # writes results file
@@ -34,7 +45,7 @@ def get_services(service_type):
     services = []
     i = 1
     while i <= services_number:
-        file = open('./descriptions/services/service_'+str(i)+'.json')
+        file = open('./dataset/services/service_'+str(i)+'.json')
         service = json.load(file)
         service['name'] = service['name'] + '_' + service_type
         service['imageUrl'] = ''
@@ -50,8 +61,10 @@ def get_services(service_type):
 
 
 # gets service request
-def get_request(approach, length):
-    path = './descriptions/requests/' + approach + '/' + str(length)
+def get_request(path, n, approach, length):
+    if approach == 'doa' or approach == 'planning':
+        approach = 'goal'
+    path = path + str(n) + '-services/requests/' + approach + '/' + str(length)
     request = random.choice(os.listdir(path))
     return request
 
@@ -127,6 +140,9 @@ def planning_composition(external_url, request):
 
 # main program that runs experiments
 def main():
+    # creating dataset for the experiment
+    create_dataset(dataset_path, services_number, requests_number, max_length)
+
     # deploying AWS resources
     print('0. Deploying resources...')
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml',
@@ -149,8 +165,8 @@ def main():
         time.sleep(10)
         for length in lengths:
             i = 1
-            while i <= requests_number:
-                request = get_request(approach, length)
+            while i <= experiment_requests:
+                request = get_request(dataset_path, services_number, approach, length)
                 if approach == 'doa':
                     doa_composition(request)
                 if approach == 'conversation':
