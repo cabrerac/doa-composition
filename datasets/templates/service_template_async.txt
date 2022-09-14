@@ -4,6 +4,7 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 import time
 import json
+from logic import util
 
 
 rabbit_credentials_file = 'rabbit-mq.yaml'
@@ -16,11 +17,13 @@ def callback(ch, method, properties, body):
     expected_output = message['expected_output']
     ms = <time>
     time.sleep(ms)
+    description = util.read_service_description('./description/<service>.json')
+    outputs = description['outputs']
+    for output in outputs:
+        output['value'] = 'Output value from <service>'
     message_dict = {
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from <service>_async', 'next_topic': 'service.<output_name>',
-        'parameters': [
-            {'name': 'p', 'value': 'Response from <service>_async'}
-        ]
+        'outputs': outputs
     }
     next_topic = message_dict['next_topic']
     if expected_output == '<output_name>':

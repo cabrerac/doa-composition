@@ -2,15 +2,13 @@
   "outputs": [
     {
       "name": "_OUTPUT_SERVICE_2",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
-      "desc": "Output of service"
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
   "inputs": [
     {
       "name": "_OUTPUT_SERVICE_1",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
-      "desc": "Input of service"
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
   "name": "service_2",

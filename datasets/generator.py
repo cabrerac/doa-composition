@@ -68,19 +68,19 @@ def create_goal_request(name, output, n, first, last):
 # creates request for conversation-based approach
 def create_conversation_request(name, output, n, first, last):
     current = first
-    tasks = []
+    tasks = {}
     t = 1
     if current == last:
         file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
         current_service = json.load(file)
         task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-        tasks.append(task)
+        tasks['task_' + str(t)] = task
     else:
         while current != last:
             file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
             current_service = json.load(file)
             task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-            tasks.append(task)
+            tasks['task_' + str(t)] = task
             t = t + 1
             current = current + 1
             if current > n:
@@ -88,7 +88,7 @@ def create_conversation_request(name, output, n, first, last):
         file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
         current_service = json.load(file)
         task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-        tasks.append(task)
+        tasks['task_' + str(t)] = task
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
@@ -99,7 +99,7 @@ def create_conversation_request(name, output, n, first, last):
 
 
 # creates services implementation
-def create_services(n):
+def create_services(experiment, n):
     s = 1
     while s <= n:
         t = random.random()
@@ -145,12 +145,12 @@ def create_services(n):
         service_name = service['name']
         for line in fin:
             # read replace the string and write to output file
-            fout.write(line.replace('<service>', service_name))
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
         # close input and output files
         fin.close()
         fout.close()
 
-        # Writing sync dockerfiles
+        # Writing async dockerfiles
         fin = open('./datasets/templates/docker-template-async', 'rt')
         fout = open('./dockers/service-' + str(s) + '-async', 'wt')
         # for each line in the input file
@@ -159,7 +159,7 @@ def create_services(n):
         service_name = service['name']
         for line in fin:
             # read replace the string and write to output file
-            fout.write(line.replace('<service>', service_name))
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
         # close input and output files
         fin.close()
         fout.close()

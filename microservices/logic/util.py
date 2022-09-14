@@ -1,5 +1,6 @@
 from cfn_tools import load_yaml
 import pika
+import json
 
 
 def read_rabbit_credentials(file):
@@ -21,3 +22,8 @@ def publish_message(host, msg, queue):
         ))
     connection.close()
 
+
+def read_service_description(file):
+    f = open(file)
+    description = json.load(f)
+    return description

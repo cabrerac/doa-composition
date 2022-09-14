@@ -24,6 +24,9 @@ def get_services(query):
     mongo_client = pymongo.MongoClient('mongodb://localhost:27017/')
     registry_db = mongo_client['registry']
     services_col = registry_db['services']
-    services = services_col.find(query)
+    cursor = services_col.find(query)
+    services = []
+    for service in cursor:
+        services.append(service)
     mongo_client.close()
     return services

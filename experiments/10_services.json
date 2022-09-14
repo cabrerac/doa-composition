@@ -1,5 +1,6 @@
 {
-  "approaches": ["doa"],
+  "experiment": "10-services",
+  "approaches": ["doa", "conversation", "planning"],
   "max_length": 5,
   "lengths": [1, 2, 3, 4, 5],
   "services_number": 10,

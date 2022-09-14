@@ -2,17 +2,16 @@ from registry import data_access
 
 
 def create_plan(request):
-    plan = {'id': request['id']}
+    plan = {'name': request['name']}
     outputs = request['outputs']
     inputs = request['inputs']
     found = False
     services = {}
-    while not found:
+    print(request['name'])
+    while outputs != inputs:
         query = {'outputs': outputs}
-        service = data_access.get_services(query)
+        service = data_access.get_services(query)[0]
         services[len(services)+1] = service
-        if inputs == service['inputs']:
-            found = True
-        else:
-            outputs = service['outputs']
+        outputs = service['inputs']
+        plan['services'] = services
     return plan
