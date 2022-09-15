@@ -7,7 +7,6 @@ def create_plan(request):
     inputs = request['inputs']
     found = False
     services = {}
-    print(request['name'])
     while outputs != inputs:
         query = {'outputs': outputs}
         service = data_access.get_services(query)[0]

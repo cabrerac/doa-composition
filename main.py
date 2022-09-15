@@ -38,7 +38,7 @@ def create_dataset(experiment, path, n, r, le):
 # writes results file
 def save(file_name, res, fmt):
     df = pd.DataFrame.from_dict(res)
-    df.drop(columns=['request_time', 'response_time'])
+    df = df.drop(columns=['request_time', 'response_time'])
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     with open(file_name, 'w', newline='', encoding=fmt) as f:
         df.to_csv(f, encoding=fmt, index=False, header=f.tell() == 0)
@@ -106,6 +106,7 @@ def callback(ch, method, properties, body):
 
 # doa based composition approach
 def doa_composition(request, n, le):
+    print(request)
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request DOA: ' + req_id + ' ::: ' + request['name'] )
@@ -117,20 +118,20 @@ def doa_composition(request, n, le):
     producer = Producer(credentials)
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': 0}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
     producer.publish(topic, message_dict)
-    measurement['input_size'] = sys.getsizeof(request)
     metrics[req_id] = measurement
     
 
 
 # conversation based composition approach
 def conversation_composition(external_url, request, n, le):
+    print(request)
     req_id = 'conversation_' + str(len(metrics) + 1)
     print('Request Conversation: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'conversation', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': 0}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
     metrics[req_id] = measurement
     plan = conversations.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
@@ -155,18 +156,18 @@ def conversation_composition(external_url, request, n, le):
         request_size = sys.getsizeof(response.request.method) + sys.getsizeof(response.request.url) \
                        + sys.getsizeof(response.request.headers) + sys.getsizeof(response.request.body)
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
-    metrics[req_id]['input_size'] = sys.getsizeof(request)
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
 
 
 # planning based composition approach
 def planning_composition(external_url, request, n, le):
+    print(request)
     req_id = 'planning_' + str(len(metrics) + 1)
     print('Request Planning: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'conversation', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': 0}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
     metrics[req_id] = measurement
     plan = backward_planning.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
@@ -189,7 +190,6 @@ def planning_composition(external_url, request, n, le):
         request_size = sys.getsizeof(response.request.method) + sys.getsizeof(response.request.url) \
                        + sys.getsizeof(response.request.headers) + sys.getsizeof(response.request.body)
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
-    metrics[req_id]['input_size'] = sys.getsizeof(request)
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
 
@@ -235,12 +235,12 @@ def main(parameters_file):
     for length in lengths:
         all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
     print('6. Executing experiments...')
-    for length in lengths:
-        requests = all_requests[length]
-        i = 0
-        while i < experiment_requests:
-            request_file = requests[i]
-            for approach in approaches:
+    for approach in approaches:
+        for length in lengths:
+            requests = all_requests[length]
+            i = 0
+            while i < experiment_requests:
+                request_file = requests[i]
                 if approach == 'doa':
                     request = get_request(dataset_path, services_number, 'goal', length, request_file)
                     doa_composition(request, services_number, length)
@@ -251,16 +251,16 @@ def main(parameters_file):
                     request = get_request(dataset_path, services_number, 'conversation', length, request_file)
                     conversation_composition(external_url, request, services_number, length)
                 time.sleep(2)
-            i = i + 1
+                i = i + 1
     # removing services from AWS
     print('7. Removing services...')
-    deploy_to_aws.remove_services(services_sync)
-    deploy_to_aws.remove_services(services_async)
-    data_access.remove_services()
+    #deploy_to_aws.remove_services(services_sync)
+    #deploy_to_aws.remove_services(services_async)
+    #data_access.remove_services()
     # removing AWS resources
     time.sleep(600)
     print('8. Removing resources...')
-    deploy_to_aws.remove_resources()
+    #deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
 
