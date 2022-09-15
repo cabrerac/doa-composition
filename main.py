@@ -251,14 +251,16 @@ def main(parameters_file):
                     conversation_composition(external_url, request, services_number, length)
                 time.sleep(2)
                 i = i + 1
+    # plotting results
+    print('7. Plotting results...')
     # removing services from AWS
-    print('7. Removing services...')
+    print('8. Removing services...')
     #deploy_to_aws.remove_services(services_sync)
     #deploy_to_aws.remove_services(services_async)
     #data_access.remove_services()
     # removing AWS resources
     #time.sleep(600)
-    print('8. Removing resources...')
+    print('9. Removing resources...')
     #deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
