@@ -4,6 +4,7 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 import time
 import json
+import sys
 from logic import util
 
 
@@ -15,7 +16,8 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     user_topic = message['user_topic']
     expected_output = message['expected_output']
-    ms = 0.0014
+    messages_size = message['messages_size']
+    ms = 0.0068
     time.sleep(ms)
     description = util.read_service_description('./description/service_1.json')
     outputs = description['outputs']
@@ -25,6 +27,8 @@ def callback(ch, method, properties, body):
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_1_async', 'next_topic': 'service._OUTPUT_SERVICE_1',
         'outputs': outputs
     }
+    messages_size = messages_size + sys.getsizeof(message_dict)
+    message_dict['messages_size'] = messages_size
     next_topic = message_dict['next_topic']
     if expected_output == '_OUTPUT_SERVICE_1':
         next_topic = user_topic

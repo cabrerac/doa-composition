@@ -79,7 +79,7 @@ def get_requests(path, services_number, experiment_requests, length):
 # get request
 def get_request(path, services_number, approach, length, file_name):
     path = path + str(services_number) + '-services/requests/' + approach + '/' + str(length) + '/' + file_name
-    request = json.load(open(path + file_name))
+    request = json.load(open(path))
     return request
 
 
@@ -119,8 +119,9 @@ def doa_composition(request, n, le):
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': 0}
     producer.publish(topic, message_dict)
-    metrics[req_id]['input_size'] = sys.getsizeof(request)
+    measurement['input_size'] = sys.getsizeof(request)
     metrics[req_id] = measurement
+    
 
 
 # conversation based composition approach
@@ -236,8 +237,8 @@ def main(parameters_file):
     print('6. Executing experiments...')
     for length in lengths:
         requests = all_requests[length]
-        i = 1
-        while i <= experiment_requests:
+        i = 0
+        while i < experiment_requests:
             request_file = requests[i]
             for approach in approaches:
                 if approach == 'doa':
