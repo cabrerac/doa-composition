@@ -106,7 +106,6 @@ def callback(ch, method, properties, body):
 
 # doa based composition approach
 def doa_composition(request, n, le):
-    print(request)
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request DOA: ' + req_id + ' ::: ' + request['name'] )
@@ -114,11 +113,11 @@ def doa_composition(request, n, le):
     expected_output = request['outputs'][0]['name']
     message_dict = {'req_id': req_id, 'expected_output': expected_output, 'user_topic': 'user.response',
                     'desc': 'request from main!!!'}
-    message_dict['messages_size'] = sys.getsizeof(message_dict)
+    message_dict['messages_size'] = sys.getsizeof(str(message_dict))
     producer = Producer(credentials)
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     producer.publish(topic, message_dict)
     metrics[req_id] = measurement
     
@@ -126,12 +125,11 @@ def doa_composition(request, n, le):
 
 # conversation based composition approach
 def conversation_composition(external_url, request, n, le):
-    print(request)
     req_id = 'conversation_' + str(len(metrics) + 1)
     print('Request Conversation: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'conversation', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
     plan = conversations.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
@@ -153,8 +151,8 @@ def conversation_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(response.request.method) + sys.getsizeof(response.request.url) \
-                       + sys.getsizeof(response.request.headers) + sys.getsizeof(response.request.body)
+        request_size = sys.getsizeof(str(response.request.method)) + sys.getsizeof(str(response.request.url)) \
+                       + sys.getsizeof(str(response.request.headers)) + sys.getsizeof(str(response.request.body))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
@@ -163,11 +161,12 @@ def conversation_composition(external_url, request, n, le):
 # planning based composition approach
 def planning_composition(external_url, request, n, le):
     print(request)
+    print(str(sys.getsizeof(str(request))))
     req_id = 'planning_' + str(len(metrics) + 1)
     print('Request Planning: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'conversation', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(request)}
+                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
     plan = backward_planning.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
@@ -187,8 +186,8 @@ def planning_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(response.request.method) + sys.getsizeof(response.request.url) \
-                       + sys.getsizeof(response.request.headers) + sys.getsizeof(response.request.body)
+        request_size = sys.getsizeof(str(response.request.method)) + sys.getsizeof(str(response.request.url)) \
+                       + sys.getsizeof(str(response.request.headers)) + sys.getsizeof(str(response.request.body))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
@@ -223,11 +222,11 @@ def main(parameters_file):
     print('3. Deploying services...')
     print('- Deploying asynchronous services')
     services_async = get_services('async', services_number, 1)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     rabbit_doa_consumer()
     print('- Deploying synchronous services')
     services_sync = get_services('sync', services_number, len(services_async) + 1)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
     data_access.insert_services(services_sync)
     print('5. Defining requests...')
@@ -258,7 +257,7 @@ def main(parameters_file):
     #deploy_to_aws.remove_services(services_async)
     #data_access.remove_services()
     # removing AWS resources
-    time.sleep(600)
+    #time.sleep(600)
     print('8. Removing resources...')
     #deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")

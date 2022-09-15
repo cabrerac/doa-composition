@@ -4,17 +4,17 @@
       "task": 1,
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_7",
+          "name": "_OUTPUT_SERVICE_6",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_6",
+          "name": "_OUTPUT_SERVICE_5",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ]
     }
   },
-  "name": "request_7_7"
+  "name": "request_6_6"
 }

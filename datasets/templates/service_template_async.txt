@@ -27,7 +27,7 @@ def callback(ch, method, properties, body):
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from <service>_async', 'next_topic': 'service.<output_name>',
         'outputs': outputs
     }
-    messages_size = messages_size + sys.getsizeof(message_dict)
+    messages_size = messages_size + sys.getsizeof(str(message_dict))
     message_dict['messages_size'] = messages_size
     next_topic = message_dict['next_topic']
     if expected_output == '<output_name>':

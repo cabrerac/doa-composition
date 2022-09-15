@@ -17,7 +17,7 @@ def callback(ch, method, properties, body):
     user_topic = message['user_topic']
     expected_output = message['expected_output']
     messages_size = message['messages_size']
-    ms = 0.0066
+    ms = 0.0073
     time.sleep(ms)
     description = util.read_service_description('./description/service_9.json')
     outputs = description['outputs']
@@ -27,7 +27,7 @@ def callback(ch, method, properties, body):
         'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_9_async', 'next_topic': 'service._OUTPUT_SERVICE_9',
         'outputs': outputs
     }
-    messages_size = messages_size + sys.getsizeof(message_dict)
+    messages_size = messages_size + sys.getsizeof(str(message_dict))
     message_dict['messages_size'] = messages_size
     next_topic = message_dict['next_topic']
     if expected_output == '_OUTPUT_SERVICE_9':

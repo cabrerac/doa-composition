@@ -1,7 +1,7 @@
 {
   "outputs": [
     {
-      "name": "_OUTPUT_SERVICE_6",
+      "name": "_OUTPUT_SERVICE_5",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
@@ -11,5 +11,5 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
-  "name": "request_3_6"
+  "name": "request_3_5"
 }
