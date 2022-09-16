@@ -22,35 +22,35 @@ def plot_results(parameters):
     experiment = parameters['experiment']
     results_file = parameters['results_file']
     services = parameters['services']
-    fig, axs = plt.subplots(3, len(services), figsize=(10, 10), sharex=False)
+    fig, axs = plt.subplots(len(services), 3, figsize=(25, 25), sharex=False)
     results = pd.read_csv(results_file)
     index = 0
     for services_number in services:
         results = results.loc[results['services'] == services_number]
 
-        sns.barplot(x='approach', y='total_time', hue='length', data=results, ax=axs[0][index])
-        axs[0][index].set(title=('Average Response Time'))
-        axs[0][index].set(xlabel=('Approach'))
-        axs[0][index].set(ylabel=('Milliseconds (ms)'))
-        axs[0][index].grid(linestyle='-', linewidth='1.0', color='grey')
-        handles, labels = axs[0][index].get_legend_handles_labels()
-        axs[0][index].legend(handles, labels, title='Composition\nLength')
+        sns.barplot(x='approach', y='total_time', hue='length', data=results, ax=axs[index][0])
+        axs[index][0].set(title=('Average Response Time'))
+        axs[index][0].set(xlabel=('Approach'))
+        axs[index][0].set(ylabel=('Milliseconds (ms)'))
+        axs[index][0].grid(linestyle='-', linewidth='1.0', color='grey')
+        handles, labels = axs[index][0].get_legend_handles_labels()
+        axs[index][0].legend(handles, labels, title='Composition\nLength')
 
-        sns.barplot(x='approach', y='messages_size', hue='length', data=results, ax=axs[1][index])
-        axs[1][index].set(title=('Average Messages Size'))
-        axs[1][index].set(xlabel=('Approach'))
-        axs[1][index].set(ylabel=('Bytes'))
-        axs[1][index].grid(linestyle='-', linewidth='1.0', color='grey')
-        handles, labels = axs[1][index].get_legend_handles_labels()
-        axs[1][index].legend(handles, labels, title='Composition\nLength')
+        sns.barplot(x='approach', y='messages_size', hue='length', data=results, ax=axs[index][1])
+        axs[index][1].set(title=('Average Messages Size'))
+        axs[index][1].set(xlabel=('Approach'))
+        axs[index][1].set(ylabel=('Bytes'))
+        axs[index][1].grid(linestyle='-', linewidth='1.0', color='grey')
+        handles, labels = axs[index][1].get_legend_handles_labels()
+        axs[index][1].legend(handles, labels, title='Composition\nLength')
 
-        sns.barplot(x='approach', y='input_size', hue='length', data=results, ax=axs[2][index])
-        axs[2][index].set(title=('Average Input Size'))
-        axs[2][index].set(xlabel=('Approach'))
-        axs[2][index].set(ylabel=('Bytes'))
-        axs[2][index].grid(linestyle='-', linewidth='1.0', color='grey')
-        handles, labels = axs[2][index].get_legend_handles_labels()
-        axs[2][index].legend(handles, labels, title='Composition\nLength')
+        sns.barplot(x='approach', y='input_size', hue='length', data=results, ax=axs[index][2])
+        axs[index][2].set(title=('Average Input Size'))
+        axs[index][2].set(xlabel=('Approach'))
+        axs[index][2].set(ylabel=('Bytes'))
+        axs[index][2].grid(linestyle='-', linewidth='1.0', color='grey')
+        handles, labels = axs[index][2].get_legend_handles_labels()
+        axs[index][2].legend(handles, labels, title='Composition\nLength')
 
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.savefig('./results/figs/results_' + experiment + '.pdf')
+        fig.savefig('./results/figs/results-' + experiment + '.pdf')

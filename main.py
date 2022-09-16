@@ -1,6 +1,6 @@
 import time
 import json
-import random
+"""import random
 import os
 import sys
 import pandas as pd
@@ -13,9 +13,9 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 from baselines import backward_planning
 from baselines import conversations
-from datasets import generator
+from datasets import generator"""
 from results import plotting
-
+"""
 # experimental setup variables
 metrics = {}
 results = []
@@ -269,4 +269,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')
+        print('Please provide the experiments parameters file path in the correct format...')"""
+parameters_file = './experiments/25_100_services.json'
+file = open(parameters_file)
+parameters = json.load(file)
+plotting.plot_results(parameters)
