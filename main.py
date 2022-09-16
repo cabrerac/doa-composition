@@ -14,7 +14,7 @@ from clients.consumer import Consumer
 from baselines import backward_planning
 from baselines import conversations
 from datasets import generator
-
+from results import plotting
 
 # experimental setup variables
 metrics = {}
@@ -25,10 +25,10 @@ results_file = ''
 
 
 # creates dataset
-def create_dataset(experiment, path, n, r, le):
+def create_dataset(experiment, path, n, r, lengths):
     if not os.path.exists(path + str(n) + '-services/'):
         print('- Creating services and requests...')
-        generator.create_services_requests(n, r, le)
+        generator.create_services_requests(n, r, lengths)
         print('- Creating services implementations...')
         generator.create_services(experiment, n)
     else:
@@ -122,7 +122,6 @@ def doa_composition(request, n, le):
     metrics[req_id] = measurement
     
 
-
 # conversation based composition approach
 def conversation_composition(external_url, request, n, le):
     req_id = 'conversation_' + str(len(metrics) + 1)
@@ -164,7 +163,7 @@ def planning_composition(external_url, request, n, le):
     print(str(sys.getsizeof(str(request))))
     req_id = 'planning_' + str(len(metrics) + 1)
     print('Request Planning: ' + req_id + ' ::: ' + request['name'] )
-    measurement = {'id': req_id, 'name': request['name'], 'approach': 'conversation', 'services': n, 'length': le,
+    measurement = {'id': req_id, 'name': request['name'], 'approach': 'planning', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
@@ -201,67 +200,67 @@ def main(parameters_file):
     parameters = json.load(file)
     experiment = parameters['experiment']
     approaches = parameters['approaches']
-    max_length = parameters['max_length']
     lengths = parameters['lengths']
-    services_number = parameters['services_number']
+    services = parameters['services']
     requests_number = parameters['requests_number']
     experiment_requests = parameters['experiment_requests']
     global results_file
     results_file = parameters['results_file']
 
-    # creating dataset for the experiment
-    print('1. Creating experiment datasets...')
-    create_dataset(experiment, dataset_path, services_number, requests_number, max_length)
-
     # deploying AWS resources
-    print('2. Deploying resources...')
-    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml',
-                                                                './rabbit-mq.yaml')
+    print('1. Deploying resources...')
+    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
-    print('3. Deploying services...')
-    print('- Deploying asynchronous services')
-    services_async = get_services('async', services_number, 1)
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-    rabbit_doa_consumer()
-    print('- Deploying synchronous services')
-    services_sync = get_services('sync', services_number, len(services_async) + 1)
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
-    data_access.remove_services()
-    data_access.insert_services(services_sync)
-    print('5. Defining requests...')
-    all_requests = {}
-    for length in lengths:
-        all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
-    print('6. Executing experiments...')
-    for approach in approaches:
+
+    # creating dataset for the experiment
+    for services_number in services:
+        print('2. Creating experiment datasets for ' + str(services_number) + ' services...')
+        create_dataset(experiment, dataset_path, services_number, requests_number, lengths)
+        print('3. Deploying services for ' + str(services_number) + ' services...')
+        print('- Deploying asynchronous services')
+        services_async = get_services('async', services_number, 1)
+        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+        rabbit_doa_consumer()
+        print('- Deploying synchronous services')
+        services_sync = get_services('sync', services_number, len(services_async) + 1)
+        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+        data_access.remove_services()
+        data_access.insert_services(services_sync)
+        print('5. Defining requests for ' + str(services_number) + ' services...')
+        all_requests = {}
         for length in lengths:
-            requests = all_requests[length]
-            i = 0
-            while i < experiment_requests:
-                request_file = requests[i]
-                if approach == 'doa':
-                    request = get_request(dataset_path, services_number, 'goal', length, request_file)
-                    doa_composition(request, services_number, length)
-                if approach == 'planning':
-                    request = get_request(dataset_path, services_number, 'goal', length, request_file)
-                    planning_composition(external_url, request, services_number, length)
-                if approach == 'conversation':
-                    request = get_request(dataset_path, services_number, 'conversation', length, request_file)
-                    conversation_composition(external_url, request, services_number, length)
-                time.sleep(2)
-                i = i + 1
+            all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
+        print('6. Requesting services for ' + str(services_number) + ' services...')
+        for approach in approaches:
+            for length in lengths:
+                requests = all_requests[length]
+                i = 0
+                while i < experiment_requests:
+                    request_file = requests[i]
+                    if approach == 'doa':
+                        request = get_request(dataset_path, services_number, 'goal', length, request_file)
+                        doa_composition(request, services_number, length)
+                    if approach == 'planning':
+                        request = get_request(dataset_path, services_number, 'goal', length, request_file)
+                        planning_composition(external_url, request, services_number, length)
+                    if approach == 'conversation':
+                        request = get_request(dataset_path, services_number, 'conversation', length, request_file)
+                        conversation_composition(external_url, request, services_number, length)
+                    time.sleep(2)
+                    i = i + 1
+        # removing services from AWS
+        print('7. Removing services...')
+        deploy_to_aws.remove_services(services_sync)
+        deploy_to_aws.remove_services(services_async)
+        data_access.remove_services()
+        time.sleep(600)
     # plotting results
-    print('7. Plotting results...')
-    # removing services from AWS
-    print('8. Removing services...')
-    #deploy_to_aws.remove_services(services_sync)
-    #deploy_to_aws.remove_services(services_async)
-    #data_access.remove_services()
+    print('8. Plotting results...')
+    plotting.plot_results(parameters)
     # removing AWS resources
-    #time.sleep(600)
     print('9. Removing resources...')
-    #deploy_to_aws.remove_resources()
+    deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
 

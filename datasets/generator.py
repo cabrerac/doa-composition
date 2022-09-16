@@ -4,7 +4,7 @@ import os
 
 
 # creates n services and r requests for lengths from 1 to le
-def create_services_requests(n, r, le):
+def create_services_requests(n, r, lengths):
     # creating n services
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
@@ -28,8 +28,7 @@ def create_services_requests(n, r, le):
     # creating r requests of lengths from 1 to le for goal and conversations approaches
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/')
-    length = 1
-    while length <= le:
+    for length in lengths:
         os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/')
         os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/')
         request = 1
@@ -46,7 +45,6 @@ def create_services_requests(n, r, le):
                 output = output.replace('goal', 'conversation')
                 create_conversation_request(name, output, n, first, last)
                 request = request + 1
-        length  = length + 1
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
