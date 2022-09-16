@@ -22,5 +22,11 @@ RUN mkdir ./logic
 # Copy the util code to the working directory
 COPY microservices/logic/util.py ./logic/
 
+# Create description directory
+RUN mkdir ./description
+
+# Copy the service description
+COPY datasets/descriptions/25-services/services/service_16.json ./description/
+
 # Specify the command to run on container start
 CMD ["python", "./service_16_sync.py"]

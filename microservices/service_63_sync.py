@@ -1,5 +1,7 @@
 from flask import Flask, make_response, request
 import time
+from logic import util
+
 
 # Flask interface
 app = Flask('__name__')
@@ -9,11 +11,15 @@ app = Flask('__name__')
 def service_63_sync():
     try:
         parameters = request.get_json()
-        ms = 0.0058
+        ms = 0.0013
         time.sleep(ms)
-        return make_response({'res': 'Response from service_63_sync'})
+        description = util.read_service_description('./description/service_63.json')
+        outputs = description['outputs']
+        for output in outputs:
+            output['value'] = 'Output value from service_63'
+        return make_response({'res': 'Response from service_63_sync', 'outputs': outputs})
     except:
-        return make_response({'res': 'Service exception!!!'})
+        return make_response({'res': 'Service exception!!!', 'outputs': []})
 
 
 if __name__ == '__main__':

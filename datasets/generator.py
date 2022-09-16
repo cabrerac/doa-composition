@@ -143,7 +143,7 @@ def create_services(experiment, n):
         service_name = service['name']
         for line in fin:
             # read replace the string and write to output file
-            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', str(n)+'-services'))
         # close input and output files
         fin.close()
         fout.close()
@@ -157,7 +157,7 @@ def create_services(experiment, n):
         service_name = service['name']
         for line in fin:
             # read replace the string and write to output file
-            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', str(n)+'-services'))
         # close input and output files
         fin.close()
         fout.close()

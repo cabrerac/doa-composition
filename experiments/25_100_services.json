@@ -1,5 +1,5 @@
 {
-  "experiment": "all-services",
+  "experiment": "25-100-services",
   "approaches": ["doa", "conversation", "planning"],
   "lengths": [5, 10, 15, 20],
   "services": [25, 50, 75, 100],

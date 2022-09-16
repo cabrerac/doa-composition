@@ -254,6 +254,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
         deploy_to_aws.remove_services(services_async)
         data_access.remove_services()
+        print('Waiting...')
         time.sleep(600)
     # plotting results
     print('8. Plotting results...')
@@ -261,7 +262,7 @@ def main(parameters_file):
     # removing AWS resources
     print('9. Removing resources...')
     deploy_to_aws.remove_resources()
-    print(" *** Experiments finished *** ")
+    #print(" *** Experiments finished *** ")
 
 
 if __name__ == "__main__":
