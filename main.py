@@ -1,6 +1,6 @@
 import time
 import json
-"""import random
+import random
 import os
 import sys
 import pandas as pd
@@ -13,9 +13,9 @@ from clients.producer import Producer
 from clients.consumer import Consumer
 from baselines import backward_planning
 from baselines import conversations
-from datasets import generator"""
+from datasets import generator
 from results import plotting
-"""
+
 # experimental setup variables
 metrics = {}
 results = []
@@ -213,25 +213,30 @@ def main(parameters_file):
     print('Load Balancer URL: ' + external_url)
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
-    # creating dataset for the experiment
+    print('2. Creating experiment datasets...')
     for services_number in services:
-        print('2. Creating experiment datasets for ' + str(services_number) + ' services...')
         create_dataset(experiment, dataset_path, services_number, requests_number, lengths)
-        print('3. Deploying services for ' + str(services_number) + ' services...')
-        print('- Deploying asynchronous services')
-        services_async = get_services('async', services_number, 1)
-        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-        rabbit_doa_consumer()
-        print('- Deploying synchronous services')
-        services_sync = get_services('sync', services_number, len(services_async) + 1)
-        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
-        data_access.remove_services()
-        data_access.insert_services(services_sync)
-        print('5. Defining requests for ' + str(services_number) + ' services...')
+
+    services_number = max(services)
+    print('3. Deploying ' + str(services_number) + ' services...')
+    print('- Deploying asynchronous services')
+    services_async = get_services('async', services_number, 1)
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+    rabbit_doa_consumer()
+    print('- Deploying synchronous services')
+    services_sync = get_services('sync', services_number, len(services_async) + 1)
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+    data_access.remove_services()
+    data_access.insert_services(services_sync)
+
+    # Running experiments
+    print('4. Running experiments...')
+    for services_number in services:
+        print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
             all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
-        print('6. Requesting services for ' + str(services_number) + ' services...')
+        print('- Requesting services for experiment with' + str(services_number) + ' services...')
         for approach in approaches:
             for length in lengths:
                 requests = all_requests[length]
@@ -249,28 +254,24 @@ def main(parameters_file):
                         conversation_composition(external_url, request, services_number, length)
                     time.sleep(2)
                     i = i + 1
-        # removing services from AWS
-        print('7. Removing services...')
-        deploy_to_aws.remove_services(services_sync)
-        deploy_to_aws.remove_services(services_async)
-        data_access.remove_services()
-        print('Waiting...')
-        time.sleep(600)
+    # removing services from AWS
+    print('7. Removing services...')
+    deploy_to_aws.remove_services(services_sync)
+    deploy_to_aws.remove_services(services_async)
+    data_access.remove_services()
     # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
+    print('Waiting before removing resources...')
+    time.sleep(1800)
     # removing AWS resources
     print('9. Removing resources...')
     deploy_to_aws.remove_resources()
-    #print(" *** Experiments finished *** ")
+    print(" *** Experiments finished *** ")
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')"""
-parameters_file = './experiments/25_100_services.json'
-file = open(parameters_file)
-parameters = json.load(file)
-plotting.plot_results(parameters)
+        print('Please provide the experiments parameters file path in the correct format...')
