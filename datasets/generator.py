@@ -4,11 +4,12 @@ import os
 
 
 # creates n services
-def create_services_requests(n):
+def create_services_descriptions(n):
     # creating n services
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
     service = 1
+    os.mkdir('./datasets/descriptions/')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/services')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests')
@@ -28,7 +29,6 @@ def create_services_requests(n):
 
 # creates r requests for lengths based on m services for the experiment with n services
 def create_services_requests(r, lengths, m, n):
-
     # creating r requests for lengths for goal and conversations approaches
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/')
@@ -45,14 +45,14 @@ def create_services_requests(r, lengths, m, n):
                      str(first) + '_' + str(last) + '.json'
             name = 'request_' + str(first) + '_' + str(last)
             if not os.path.exists(output):
-                create_goal_request(name, output, n, first, last)
+                _create_goal_request(name, output, n, first, last)
                 output = output.replace('goal', 'conversation')
-                create_conversation_request(name, output, n, first, last)
+                _create_conversation_request(name, output, n, first, last)
                 request = request + 1
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
-def create_goal_request(name, output, n, first, last):
+def _create_goal_request(name, output, n, first, last):
     file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(first) + '.json')
     first_service = json.load(file)
     file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(last) + '.json')
@@ -68,7 +68,7 @@ def create_goal_request(name, output, n, first, last):
 
 
 # creates request for conversation-based approach
-def create_conversation_request(name, output, n, first, last):
+def _create_conversation_request(name, output, n, first, last):
     current = first
     tasks = {}
     t = 1
@@ -101,7 +101,7 @@ def create_conversation_request(name, output, n, first, last):
 
 
 # creates services implementation for m services
-def create_services(m):
+def create_services_implementations(n, m):
     s = 1
     while s <= m:
         t = random.random()

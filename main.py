@@ -27,14 +27,14 @@ results_file = ''
 # creates dataset
 def create_dataset(path, services_number, deployable_services, requests_number, lengths):
     if not os.path.exists(path + str(services_number) + '-services/'):
-        print('- Creating services and requests...')
-        generator.create_services_requests(services_number)
-        print('- Creating services implementations...')
-        generator.create_services(deployable_services)
-        print('- Creating services requests...')
+        print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
+        generator.create_services_descriptions(services_number)
+        print('- Creating services implementations for experiment with ' + str(services_number) + 'services...')
+        generator.create_services_implementations(services_number, deployable_services)
+        print('- Creating services requests for experiment with ' + str(services_number) + 'services...')
         generator.create_services_requests(requests_number, lengths, deployable_services, services_number)
     else:
-        print('- Dataset already exists.')
+        print('- Dataset already exists for experiment with ' + str(services_number) + ' services.')
 
 
 # writes results file
@@ -47,10 +47,10 @@ def save(file_name, res, fmt):
 
 
 # defines services to register and deploy in the AWS infrastructure
-def get_services(service_type, services_number, priority):
+def get_services(service_type, services_number, deployable_services, priority):
     services = []
     i = 1
-    while i <= services_number:
+    while i <= deployable_services:
         file = open('./datasets/descriptions/' + str(services_number) + '-services/services/service_'+str(i)+'.json')
         service = json.load(file)
         service['name'] = service['name'] + '_' + service_type
@@ -212,39 +212,39 @@ def main(parameters_file):
 
     # deploying AWS resources
     print('1. Deploying resources...')
-    #external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
-    #print('Load Balancer URL: ' + external_url)
-    #print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
+    print('Load Balancer URL: ' + external_url)
+    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
     print('2. Creating experiment datasets...')
     for services_number in services:
-        create_dataset(experiment, dataset_path, services_number, deployable_services, requests_number, lengths)
+        create_dataset(dataset_path, services_number, deployable_services, requests_number, lengths)
 
     services_number = max(services)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = get_services('async', deployable_services, 1)
+    services_async = get_services('async', services_number, deployable_services, 1)
     print(str(len(services_async)))
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-    #rabbit_doa_consumer()
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+    rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = get_services('sync', deployable_services, len(services_async) + 1)
+    services_sync = get_services('sync', services_number, deployable_services, len(services_async) + 1)
     print(str(len(services_async)))
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
     # Running experiments
     print('4. Running experiments...')
     for services_number in services:
         print('- Registering services: ' + str(services_number))
-        registry_services = get_services('sync', services_number, len(services_async) + 1)
+        registry_services = get_services('sync', services_number, services_number, len(services_async) + 1)
         print(str(len(registry_services)))
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
             all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
-        """print('- Requesting services for experiment with' + str(services_number) + ' services...')
+        print('- Requesting services for experiment with' + str(services_number) + ' services...')
         for approach in approaches:
             for length in lengths:
                 requests = all_requests[length]
@@ -261,20 +261,20 @@ def main(parameters_file):
                         request = get_request(dataset_path, services_number, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     time.sleep(2)
-                    i = i + 1"""
+                    i = i + 1
         data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
-    #deploy_to_aws.remove_services(services_sync)
-    #deploy_to_aws.remove_services(services_async)
+    deploy_to_aws.remove_services(services_sync)
+    deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
-    #time.sleep(600)
+    time.sleep(600)
     # removing AWS resources
     print('9. Removing resources...')
-    #deploy_to_aws.remove_resources()
+    deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
 
