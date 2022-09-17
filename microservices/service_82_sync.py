@@ -11,7 +11,7 @@ app = Flask('__name__')
 def service_82_sync():
     try:
         parameters = request.get_json()
-        ms = 0.008
+        ms = 0.0089
         time.sleep(ms)
         description = util.read_service_description('./description/service_82.json')
         outputs = description['outputs']

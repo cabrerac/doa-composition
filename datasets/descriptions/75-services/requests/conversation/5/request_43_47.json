@@ -1,0 +1,80 @@
+{
+  "tasks": {
+    "task_1": {
+      "task": 1,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_43",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_42",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ]
+    },
+    "task_2": {
+      "task": 2,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_44",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_43",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ]
+    },
+    "task_3": {
+      "task": 3,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_45",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_44",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ]
+    },
+    "task_4": {
+      "task": 4,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_46",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_45",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ]
+    },
+    "task_5": {
+      "task": 5,
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_47",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_46",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ]
+    }
+  },
+  "name": "request_43_47"
+}
