@@ -25,12 +25,14 @@ results_file = ''
 
 
 # creates dataset
-def create_dataset(experiment, path, n, r, lengths):
-    if not os.path.exists(path + str(n) + '-services/'):
+def create_dataset(path, services_number, deployable_services, requests_number, lengths):
+    if not os.path.exists(path + str(services_number) + '-services/'):
         print('- Creating services and requests...')
-        generator.create_services_requests(n, r, lengths)
+        generator.create_services_requests(services_number)
         print('- Creating services implementations...')
-        generator.create_services(experiment, n)
+        generator.create_services(deployable_services)
+        print('- Creating services requests...')
+        generator.create_services_requests(requests_number, lengths, deployable_services, services_number)
     else:
         print('- Dataset already exists.')
 
@@ -204,6 +206,7 @@ def main(parameters_file):
     services = parameters['services']
     requests_number = parameters['requests_number']
     experiment_requests = parameters['experiment_requests']
+    deployable_services = 40
     global results_file
     results_file = parameters['results_file']
 
@@ -215,23 +218,24 @@ def main(parameters_file):
 
     print('2. Creating experiment datasets...')
     for services_number in services:
-        create_dataset(experiment, dataset_path, services_number, requests_number, lengths)
+        create_dataset(experiment, dataset_path, services_number, deployable_services, requests_number, lengths)
 
     services_number = max(services)
-    print('3. Deploying ' + str(services_number) + ' services...')
+    print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = get_services('async', services_number, 1)
+    services_async = get_services('async', deployable_services, 1)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = get_services('sync', services_number, len(services_async) + 1)
+    services_sync = get_services('sync', deployable_services, len(services_async) + 1)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
-    data_access.insert_services(services_sync)
 
     # Running experiments
     print('4. Running experiments...')
     for services_number in services:
+        registry_services = get_services('sync', services_number, len(services_async) + 1)
+        data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
@@ -254,11 +258,11 @@ def main(parameters_file):
                         conversation_composition(external_url, request, services_number, length)
                     time.sleep(2)
                     i = i + 1
+        data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
     deploy_to_aws.remove_services(services_sync)
     deploy_to_aws.remove_services(services_async)
-    data_access.remove_services()
     # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)

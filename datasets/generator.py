@@ -3,8 +3,8 @@ import random
 import os
 
 
-# creates n services and r requests for lengths from 1 to le
-def create_services_requests(n, r, lengths):
+# creates n services
+def create_services_requests(n):
     # creating n services
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
@@ -25,7 +25,11 @@ def create_services_requests(n, r, lengths):
             json.dump(service_template, f, indent=2)
         service = service + 1
 
-    # creating r requests of lengths from 1 to le for goal and conversations approaches
+
+# creates r requests for lengths based on m services for the experiment with n services
+def create_services_requests(r, lengths, m, n):
+
+    # creating r requests for lengths for goal and conversations approaches
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/')
     os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/')
     for length in lengths:
@@ -33,10 +37,10 @@ def create_services_requests(n, r, lengths):
         os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/')
         request = 1
         while request <= r:
-            first = random.randint(1, n)
+            first = random.randint(1, m)
             last = first + length - 1
-            if last > n:
-                last = last - n
+            if last > m:
+                last = last - m
             output = './datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/request_' + \
                      str(first) + '_' + str(last) + '.json'
             name = 'request_' + str(first) + '_' + str(last)
@@ -96,10 +100,10 @@ def create_conversation_request(name, output, n, first, last):
             json.dump(conversation_template, f, indent=2)
 
 
-# creates services implementation
-def create_services(experiment, n):
+# creates services implementation for m services
+def create_services(m):
     s = 1
-    while s <= n:
+    while s <= m:
         t = random.random()
         t = t / 100
         t = round(t, 4)
