@@ -3,6 +3,9 @@ import time
 from logic import util
 
 
+description = util.read_service_description('./description/service_28.json')
+
+
 # Flask interface
 app = Flask('__name__')
 
@@ -11,13 +14,12 @@ app = Flask('__name__')
 def service_28_sync():
     try:
         parameters = request.get_json()
-        ms = 0.0021
+        ms = 0.0033
         time.sleep(ms)
-        description = util.read_service_description('./description/service_28.json')
         outputs = description['outputs']
         for output in outputs:
-            output['value'] = 'Output value from service_28'
-        return make_response({'res': 'Response from service_28_sync', 'outputs': outputs})
+            output['value'] = 'Output value from ' + description['name']
+        return make_response({'res': 'Response from ' + description['name'] + '_sync', 'outputs': outputs})
     except:
         return make_response({'res': 'Service exception!!!', 'outputs': []})
 

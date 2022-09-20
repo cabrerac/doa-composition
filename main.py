@@ -1,4 +1,4 @@
-import time
+"""import time
 import json
 import random
 import os
@@ -12,9 +12,10 @@ import microservices.logic.util as util
 from clients.producer import Producer
 from clients.consumer import Consumer
 from baselines import backward_planning
-from baselines import conversations
+from baselines import conversations"""
 from datasets import generator
-from results import plotting
+#from results import plotting
+
 
 # experimental setup variables
 metrics = {}
@@ -24,65 +25,13 @@ dataset_path = './datasets/descriptions/'
 results_file = ''
 
 
-# creates dataset
-def create_dataset(path, services_number, deployable_services, requests_number, lengths):
-    if not os.path.exists(path + str(services_number) + '-services/'):
-        print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
-        generator.create_services_descriptions(services_number, deployable_services)
-        print('- Creating services implementations for experiment with ' + str(services_number) + 'services...')
-        generator.create_services_implementations(services_number, deployable_services)
-        print('- Creating services requests for experiment with ' + str(services_number) + 'services...')
-        generator.create_services_requests(requests_number, lengths, deployable_services, services_number)
-    else:
-        print('- Dataset already exists for experiment with ' + str(services_number) + ' services.')
-
-
 # writes results file
-def save(file_name, res, fmt):
+"""def save(file_name, res, fmt):
     df = pd.DataFrame.from_dict(res)
     df = df.drop(columns=['request_time', 'response_time'])
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     with open(file_name, 'w', newline='', encoding=fmt) as f:
         df.to_csv(f, encoding=fmt, index=False, header=f.tell() == 0)
-
-
-# defines services to register and deploy in the AWS infrastructure
-def get_services(service_type, services_number, deployable_services, priority):
-    services = []
-    i = 1
-    while i <= deployable_services:
-        file = open('./datasets/descriptions/' + str(services_number) + '-services/services/service_'+str(i)+'.json')
-        service = json.load(file)
-        service['name'] = service['name'] + '_' + service_type
-        service['imageUrl'] = ''
-        service['port'] = 5000
-        service['cpu'] = 256
-        service['memory'] = 512
-        service['path'] = '/doa_composition/' + service['name']
-        service['priority'] = priority
-        service['count'] = 1
-        services.append(service)
-        priority = priority + 1
-        i = i + 1
-    return services
-
-
-# gets service requests
-def get_requests(path, services_number, experiment_requests, length):
-    requests = []
-    path = path + str(services_number) + '-services/requests/goal/' + str(length) + '/'
-    while len(requests) < experiment_requests:
-        request_file = random.choice(os.listdir(path))
-        if request_file not in requests:
-            requests.append(request_file)
-    return requests
-
-
-# get request
-def get_request(path, services_number, approach, length, file_name):
-    path = path + str(services_number) + '-services/requests/' + approach + '/' + str(length) + '/' + file_name
-    request = json.load(open(path))
-    return request
 
 
 # doa based rabbit consumer
@@ -218,16 +167,16 @@ def main(parameters_file):
 
     print('2. Creating experiment datasets...')
     for services_number in services:
-        create_dataset(dataset_path, services_number, deployable_services, requests_number, lengths)
+        generator.create_dataset(dataset_path, services_number, deployable_services, requests_number, lengths)
 
     services_number = max(services)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = get_services('async', services_number, deployable_services, 1)
+    services_async = generator.get_services('async', services_number, deployable_services, 1)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = get_services('sync', services_number, deployable_services, len(services_async) + 1)
+    services_sync = generator.get_services('sync', services_number, deployable_services, len(services_async) + 1)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
@@ -235,12 +184,12 @@ def main(parameters_file):
     print('4. Running experiments...')
     for services_number in services:
         print('- Registering services: ' + str(services_number))
-        registry_services = get_services('sync', services_number, services_number, len(services_async) + 1)
+        registry_services = generator.get_services('sync', services_number, services_number, len(services_async) + 1)
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
-            all_requests[length] = get_requests(dataset_path, services_number, experiment_requests, length)
+            all_requests[length] = generator.get_requests(dataset_path, services_number, experiment_requests, length)
         print('- Requesting services for experiment with' + str(services_number) + ' services...')
         for approach in approaches:
             for length in lengths:
@@ -249,13 +198,13 @@ def main(parameters_file):
                 while i < experiment_requests:
                     request_file = requests[i]
                     if approach == 'doa':
-                        request = get_request(dataset_path, services_number, 'goal', length, request_file)
+                        request = generator.get_request(dataset_path, services_number, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
-                        request = get_request(dataset_path, services_number, 'goal', length, request_file)
+                        request = generator.get_request(dataset_path, services_number, 'goal', length, request_file)
                         planning_composition(external_url, request, services_number, length)
                     if approach == 'conversation':
-                        request = get_request(dataset_path, services_number, 'conversation', length, request_file)
+                        request = generator.get_request(dataset_path, services_number, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     time.sleep(2)
                     i = i + 1
@@ -266,7 +215,7 @@ def main(parameters_file):
     deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(600)
     # removing AWS resources
@@ -279,4 +228,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')
+        print('Please provide the experiments parameters file path in the correct format...')"""
+
+generator.create_dataset('./datasets/descriptions/', 50, 40, 10, [10])

@@ -9,6 +9,7 @@ from logic import util
 
 
 rabbit_credentials_file = 'rabbit-mq.yaml'
+description = util.read_service_description('./description/service_27.json')
 
 
 def callback(ch, method, properties, body):
@@ -17,20 +18,19 @@ def callback(ch, method, properties, body):
     user_topic = message['user_topic']
     expected_output = message['expected_output']
     messages_size = message['messages_size']
-    ms = 0.0082
+    ms = 0.0032
     time.sleep(ms)
-    description = util.read_service_description('./description/service_27.json')
     outputs = description['outputs']
     for output in outputs:
-        output['value'] = 'Output value from service_27'
+        output['value'] = 'Output value from ' + description['name']
     message_dict = {
-        'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from service_27_async', 'next_topic': 'service._OUTPUT_SERVICE_27',
+        'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
         'outputs': outputs
     }
     messages_size = messages_size + sys.getsizeof(str(message_dict))
     message_dict['messages_size'] = messages_size
     next_topic = message_dict['next_topic']
-    if expected_output == '_OUTPUT_SERVICE_27':
+    if expected_output == outputs[0]['name']:
         next_topic = user_topic
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     producer = Producer(credentials)
@@ -38,8 +38,10 @@ def callback(ch, method, properties, body):
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-consumer_thread = Consumer(credentials, 'service._OUTPUT_SERVICE_26', callback)
-consumer_thread.start()
+inputs = description['inputs']
+for inp in inputs:
+    consumer_thread = Consumer(credentials, 'service.' + inp['name'], callback)
+    consumer_thread.start()
 
 
 # Flask interface
