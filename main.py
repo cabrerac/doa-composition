@@ -28,7 +28,7 @@ results_file = ''
 def create_dataset(path, services_number, deployable_services, requests_number, lengths):
     if not os.path.exists(path + str(services_number) + '-services/'):
         print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
-        generator.create_services_descriptions(services_number)
+        generator.create_services_descriptions(services_number, deployable_services)
         print('- Creating services implementations for experiment with ' + str(services_number) + 'services...')
         generator.create_services_implementations(services_number, deployable_services)
         print('- Creating services requests for experiment with ' + str(services_number) + 'services...')
@@ -224,12 +224,10 @@ def main(parameters_file):
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
     services_async = get_services('async', services_number, deployable_services, 1)
-    print(str(len(services_async)))
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     rabbit_doa_consumer()
     print('- Deploying synchronous services')
     services_sync = get_services('sync', services_number, deployable_services, len(services_async) + 1)
-    print(str(len(services_async)))
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
@@ -238,7 +236,6 @@ def main(parameters_file):
     for services_number in services:
         print('- Registering services: ' + str(services_number))
         registry_services = get_services('sync', services_number, services_number, len(services_async) + 1)
-        print(str(len(registry_services)))
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
@@ -269,7 +266,7 @@ def main(parameters_file):
     deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
-    plotting.plot_results(parameters)
+    #plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(600)
     # removing AWS resources

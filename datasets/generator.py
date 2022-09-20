@@ -4,7 +4,7 @@ import os
 
 
 # creates n services
-def create_services_descriptions(n):
+def create_services_descriptions(n, m):
     # creating n services
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
@@ -17,7 +17,7 @@ def create_services_descriptions(n):
         output = service
         inp = service - 1
         if service == 1:
-            inp = n
+            inp = m
         service_template['outputs'][0]['name'] = '_OUTPUT_SERVICE_' + str(output)
         service_template['inputs'][0]['name'] = '_OUTPUT_SERVICE_' + str(inp)
         service_template['name'] = 'service_' + str(service)
