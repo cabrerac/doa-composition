@@ -17,7 +17,7 @@ def callback(ch, method, properties, body):
     user_topic = message['user_topic']
     expected_output = message['expected_output']
     messages_size = message['messages_size']
-    ms = 0.0081
+    ms = 0.0021
     time.sleep(ms)
     description = util.read_service_description('./description/service_28.json')
     outputs = description['outputs']

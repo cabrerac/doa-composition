@@ -17,7 +17,7 @@ def callback(ch, method, properties, body):
     user_topic = message['user_topic']
     expected_output = message['expected_output']
     messages_size = message['messages_size']
-    ms = 0.0086
+    ms = 0.0001
     time.sleep(ms)
     description = util.read_service_description('./description/service_1.json')
     outputs = description['outputs']
@@ -38,7 +38,7 @@ def callback(ch, method, properties, body):
 
 
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-consumer_thread = Consumer(credentials, 'service._OUTPUT_SERVICE_10000', callback)
+consumer_thread = Consumer(credentials, 'service._OUTPUT_SERVICE_40', callback)
 consumer_thread.start()
 
 

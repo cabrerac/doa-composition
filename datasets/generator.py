@@ -1,6 +1,7 @@
 import json
 import random
 import os
+from pathlib import Path
 
 
 # creates n services
@@ -9,10 +10,8 @@ def create_services_descriptions(n, m):
     file = open('./datasets/templates/service_template.json')
     service_template = json.load(file)
     service = 1
-    os.mkdir('./datasets/descriptions/')
-    os.mkdir('./datasets/descriptions/' + str(n) + '-services/')
-    os.mkdir('./datasets/descriptions/' + str(n) + '-services/services')
-    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests')
+    Path('./datasets/descriptions/' + str(n) + '-services/services').mkdir(parents=True, exist_ok=True)
+    Path('./datasets/descriptions/' + str(n) + '-services/requests').mkdir(parents=True, exist_ok=True)
     while service <= n:
         output = service
         inp = service - 1
@@ -30,11 +29,11 @@ def create_services_descriptions(n, m):
 # creates r requests for lengths based on m services for the experiment with n services
 def create_services_requests(r, lengths, m, n):
     # creating r requests for lengths for goal and conversations approaches
-    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/')
-    os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/')
+    Path('./datasets/descriptions/' + str(n) + '-services/requests/goal').mkdir(parents=True, exist_ok=True)
+    Path('./datasets/descriptions/' + str(n) + '-services/requests/conversation').mkdir(parents=True, exist_ok=True)
     for length in lengths:
-        os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/')
-        os.mkdir('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/')
+        Path('./datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
+        Path('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         request = 1
         while request <= r:
             first = random.randint(1, m)
