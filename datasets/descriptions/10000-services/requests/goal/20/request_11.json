@@ -1,43 +1,15 @@
 {
   "outputs": [
     {
-      "name": "_OUTPUT_SERVICE_2",
+      "name": "_OUTPUT_SERVICE_23",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_5",
+      "name": "_OUTPUT_SERVICE_36",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_6",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_11",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_24",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_26",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_30",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_31",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_7",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_12",
+      "name": "_OUTPUT_SERVICE_38",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
@@ -45,15 +17,31 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
+      "name": "_OUTPUT_SERVICE_24",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_11",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_13",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_16",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
       "name": "_OUTPUT_SERVICE_18",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_19",
+      "name": "_OUTPUT_SERVICE_21",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_23",
+      "name": "_OUTPUT_SERVICE_30",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],

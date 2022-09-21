@@ -165,25 +165,24 @@ def main(parameters_file):
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
     print('2. Creating experiment datasets...')
-    for services_number in services:
-        generator.create_dataset(dataset_path, services_number, deployable_services, requests_number, lengths)
-
+    created_services = generator.create_dataset(dataset_path, services, deployable_services, requests_number, lengths)
+    print(str(created_services))
     services_number = max(services)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = generator.get_services('async', services_number, deployable_services, 1)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-    rabbit_doa_consumer()
+    services_async = generator.get_services('async', services_number, created_services, 1)
+    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+    #rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = generator.get_services('sync', services_number, deployable_services, len(services_async) + 1)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+    services_sync = generator.get_services('sync', services_number, created_services, len(services_async) + 1)
+    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
     # Running experiments
     print('4. Running experiments...')
     for services_number in services:
         print('- Registering services: ' + str(services_number))
-        registry_services = generator.get_services('sync', services_number, services_number, len(services_async) + 1)
+        registry_services = generator.get_services('sync', services_number, created_services, len(services_async) + 1)
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
@@ -210,16 +209,16 @@ def main(parameters_file):
         data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
-    deploy_to_aws.remove_services(services_sync)
-    deploy_to_aws.remove_services(services_async)
+    #deploy_to_aws.remove_services(services_sync)
+    #deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
     print('Waiting before removing resources...')
-    time.sleep(600)
+    #time.sleep(600)
     # removing AWS resources
     print('9. Removing resources...')
-    deploy_to_aws.remove_resources()
+    #deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
 

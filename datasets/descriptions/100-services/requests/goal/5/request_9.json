@@ -5,7 +5,11 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_15",
+      "name": "_OUTPUT_SERVICE_3",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_24",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],

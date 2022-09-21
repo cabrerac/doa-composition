@@ -8,17 +8,19 @@ from itertools import combinations
 
 
 # creates experiment dataset
-def create_dataset(path, services_number, deployable_services, requests_number, lengths):
-    if os.path.exists(path + str(services_number) + '-services/'):
-        shutil.rmtree(path + str(services_number) + '-services/')
+def create_dataset(path, services, deployable_services, requests_number, lengths):
     g = nx.barabasi_albert_graph(deployable_services, 2)
     dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
-    print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
-    create_services_descriptions(services_number, dag)
-    print('- Creating services implementations for experiment with ' + str(services_number) + ' services...')
-    create_services_implementations(services_number, dag)
-    print('- Creating services requests for experiment with ' + str(services_number) + ' services...')
-    create_services_requests(requests_number, lengths, dag, services_number)
+    for services_number in services:
+        if os.path.exists(path + str(services_number) + '-services/'):
+            shutil.rmtree(path + str(services_number) + '-services/')
+        print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
+        create_services_descriptions(services_number, dag)
+        print('- Creating services implementations for experiment with ' + str(services_number) + ' services...')
+        create_services_implementations(services_number, dag)
+        print('- Creating services requests for experiment with ' + str(services_number) + ' services...')
+        create_services_requests(requests_number, lengths, dag, services_number)
+    return list(dag.nodes)
 
 
 # creates n services
@@ -206,11 +208,10 @@ def _create_conversation_request(n, length, req, dag):
 
 
 # defines services to register and deploy in the AWS infrastructure
-def get_services(service_type, services_number, deployable_services, priority):
+def get_services(service_type, services_number, created_services, priority):
     services = []
-    i = 1
-    while i <= deployable_services:
-        file = open('./datasets/descriptions/' + str(services_number) + '-services/services/service_'+str(i)+'.json')
+    for node in created_services:
+        file = open('./datasets/descriptions/' + str(services_number) + '-services/services/service_'+str(node)+'.json')
         service = json.load(file)
         service['name'] = service['name'] + '_' + service_type
         service['imageUrl'] = ''
@@ -222,7 +223,6 @@ def get_services(service_type, services_number, deployable_services, priority):
         service['count'] = 1
         services.append(service)
         priority = priority + 1
-        i = i + 1
     return services
 
 

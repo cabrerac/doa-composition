@@ -1,4 +1,4 @@
-rabbitmq_url: b-381ce38e-61a1-4c54-a6d9-b2cf269c960c.mq.eu-west-2.amazonaws.com
+rabbitmq_url: b-ff16ccb9-cfc0-4ca1-9433-4073f13cbe1d.mq.eu-west-2.amazonaws.com
 username: doacomp
 password: doa-composition
 port: 5671

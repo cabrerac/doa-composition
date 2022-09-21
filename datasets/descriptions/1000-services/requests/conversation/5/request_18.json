@@ -84,14 +84,14 @@
         1
       ],
       "successors": [
-        23
+        8
       ]
     },
-    "task_23": {
-      "task": "23",
+    "task_8": {
+      "task": "8",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_23",
+          "name": "_OUTPUT_SERVICE_8",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
@@ -101,7 +101,7 @@
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_18",
+          "name": "_OUTPUT_SERVICE_4",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
