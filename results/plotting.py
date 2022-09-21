@@ -52,9 +52,9 @@ def _plot_all_metrics(parameters):
             axs[index][2].grid(linestyle='-', linewidth='1.0', color='grey')
             handles, labels = axs[index][2].get_legend_handles_labels()
             axs[index][2].legend(handles, labels, title='Composition\nLength')
-
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.savefig('./results/figs/results-' + experiment + '.pdf')
+        index = index + 1
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    fig.savefig('./results/figs/results-' + experiment + '.pdf')
 
 
 # plots a graph per each experiment with different services
