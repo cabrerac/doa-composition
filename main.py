@@ -209,7 +209,7 @@ def main(parameters_file):
     results_file = parameters['results_file']
 
     # deploying AWS resources
-    print('1. Deploying resources...')
+    """print('1. Deploying resources...')
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
@@ -261,15 +261,15 @@ def main(parameters_file):
     # removing services from AWS
     print('7. Removing services...')
     deploy_to_aws.remove_services(services_sync)
-    deploy_to_aws.remove_services(services_async)
+    deploy_to_aws.remove_services(services_async)"""
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
-    print('Waiting before removing resources...')
+    plotting.plot_results(parameters)
+    """print('Waiting before removing resources...')
     time.sleep(600)
     # removing AWS resources
     print('9. Removing resources...')
-    deploy_to_aws.remove_resources()
+    deploy_to_aws.remove_resources()"""
     print(" *** Experiments finished *** ")
 
 
