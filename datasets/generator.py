@@ -46,7 +46,7 @@ def create_services_requests(r, lengths, m, n):
             if not os.path.exists(output):
                 _create_goal_request(name, output, n, first, last)
                 output = output.replace('goal', 'conversation')
-                _create_conversation_request(name, output, n, first, last)
+                _create_conversation_request(name, output, n, m, first, last)
                 request = request + 1
 
 
@@ -67,7 +67,7 @@ def _create_goal_request(name, output, n, first, last):
 
 
 # creates request for conversation-based approach
-def _create_conversation_request(name, output, n, first, last):
+def _create_conversation_request(name, output, n, m, first, last):
     current = first
     tasks = {}
     t = 1
@@ -84,8 +84,8 @@ def _create_conversation_request(name, output, n, first, last):
             tasks['task_' + str(t)] = task
             t = t + 1
             current = current + 1
-            if current > n:
-                current = current - n
+            if current > m:
+                current = current - m
         file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
         current_service = json.load(file)
         task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}

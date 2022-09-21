@@ -161,8 +161,6 @@ def conversation_composition(external_url, request, n, le):
 
 # planning based composition approach
 def planning_composition(external_url, request, n, le):
-    print(request)
-    print(str(sys.getsizeof(str(request))))
     req_id = 'planning_' + str(len(metrics) + 1)
     print('Request Planning: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'planning', 'services': n, 'length': le,
