@@ -67,7 +67,7 @@ def _plot_services(parameters):
     index = 0
     for services_number in services:
         filtered_results = results.loc[results['services'] == services_number]
-        fig, axs = plt.subplots(1, 3, figsize=(25, 25), sharex=False)
+        fig, axs = plt.subplots(1, 3, figsize=(12, 25), sharex=False)
         if len(results) > 0:
             sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[0])
             axs[0].set(title=('Average Response Time'))
