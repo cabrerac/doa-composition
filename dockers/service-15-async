@@ -36,7 +36,7 @@ COPY clients/producer.py ./clients/
 RUN mkdir ./description
 
 # Copy the service description
-COPY datasets/descriptions/50-services/services/service_15.json ./description/
+COPY datasets/descriptions/10000-services/services/service_15.json ./description/
 
 # Specify the command to run on container start
 CMD ["python", "-u", "./service_15_async.py"]

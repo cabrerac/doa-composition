@@ -26,7 +26,7 @@ COPY microservices/logic/util.py ./logic/
 RUN mkdir ./description
 
 # Copy the service description
-COPY datasets/descriptions/50-services/services/service_7.json ./description/
+COPY datasets/descriptions/10000-services/services/service_7.json ./description/
 
 # Specify the command to run on container start
 CMD ["python", "./service_7_sync.py"]

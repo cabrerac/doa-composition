@@ -1,0 +1,16 @@
+{
+  "outputs": [
+    {
+      "name": "_OUTPUT_SERVICE_DUMMY_3859",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "_INPUT_SERVICE_DUMMY_3859",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "name": "service_3859",
+  "description": "This is the service 3859"
+}

@@ -5,14 +5,13 @@ from pathlib import Path
 import networkx as nx
 import shutil
 from itertools import combinations
-import matplotlib.pyplot as plt
 
 
 # creates experiment dataset
 def create_dataset(path, services_number, deployable_services, requests_number, lengths):
     if os.path.exists(path + str(services_number) + '-services/'):
         shutil.rmtree(path + str(services_number) + '-services/')
-    g = nx.gnp_random_graph(deployable_services, 0.1, directed=True)
+    g = nx.barabasi_albert_graph(deployable_services, 2)
     dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
     print('- Creating services and requests for experiment with ' + str(services_number) + ' services...')
     create_services_descriptions(services_number, dag)
@@ -48,7 +47,6 @@ def create_services_descriptions(n, dag):
         with open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(node) + '.json','w') as f:
             json.dump(service_template, f, indent=2)
         services = services + 1
-
     while services < n:
         file = open('./datasets/templates/service_template.json')
         service_template = json.load(file)
@@ -133,80 +131,77 @@ def create_services_requests(r, lengths, dag, n):
         Path('./datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         Path('./datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         requests = []
-        i = 0
         for nodes in combinations(dag.nodes, length):
             dag_sub = dag.subgraph(nodes)
             if nx.is_weakly_connected(dag_sub):
                 requests.append(dag_sub)
-                nx.draw(dag_sub, with_labels=True)
-                plt.show()
             if len(requests) >= r:
                 break
-            i = i = 1
-
-        print('here')
-        """request = 0
-        while request < r:
-            first = random.randint(1, m)
-            last = first + length - 1
-            if last > m:
-                last = last - m
-            output = './datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/request_' + \
-                     str(first) + '_' + str(last) + '.json'
-            name = 'request_' + str(first) + '_' + str(last)
-            if not os.path.exists(output):
-                _create_goal_request(name, output, n, first, last)
-                output = output.replace('goal', 'conversation')
-                _create_conversation_request(name, output, n, first, last)
-                request = request + 1"""
+        req = 0
+        for request in requests:
+            _create_goal_request(n, length, req, request)
+            _create_conversation_request(n, length, req, request)
+            req = req + 1
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
-def _create_goal_request(name, output, n, first, last):
-    file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(first) + '.json')
-    first_service = json.load(file)
-    file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(last) + '.json')
-    last_service = json.load(file)
+def _create_goal_request(n, length, req, dag):
+    request_file = './datasets/descriptions/' + str(n) + '-services/requests/goal/' + str(length) + '/request_' + str(req) + '.json'
+    firsts = []
+    lasts = []
+    for node in dag:
+        predecessors = dag.predecessors(node)
+        predecessors = list(dict.fromkeys(predecessors))
+        if len(predecessors) == 0:
+            firsts.append(node)
+        successors = dag.successors(node)
+        successors = list(dict.fromkeys(successors))
+        if len(successors) == 0:
+            lasts.append(node)
+    inputs = []
+    for node in firsts:
+        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        for inp in service['inputs']:
+            if inp not in inputs:
+                inputs.append(inp)
+    outputs = []
+    for node in lasts:
+        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        for output in service['outputs']:
+            if output not in outputs:
+                outputs.append(output)
     file = open('./datasets/templates/goal_request_template.json')
     goal_template = json.load(file)
-    goal_template['outputs'] = last_service['outputs']
-    goal_template['inputs'] = first_service['inputs']
-    goal_template['name'] = name
-    if not os.path.exists(output):
-        with open(output, 'w') as f:
+    goal_template['inputs'] = inputs
+    goal_template['outputs'] = outputs
+    goal_template['name'] = 'request_' + str(req)
+    if not os.path.exists(request_file):
+        with open(request_file, 'w') as f:
             json.dump(goal_template, f, indent=2)
 
 
 # creates request for conversation-based approach
-def _create_conversation_request(name, output, n, first, last):
-    current = first
+def _create_conversation_request(n, length, req, dag):
+    request_file = './datasets/descriptions/' + str(n) + '-services/requests/conversation/' + str(length) + '/request_' + str(req) + '.json'
     tasks = {}
-    t = 1
-    if current == last:
-        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
-        current_service = json.load(file)
-        task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-        tasks['task_' + str(t)] = task
-    else:
-        while current != last:
-            file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
-            current_service = json.load(file)
-            task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-            tasks['task_' + str(t)] = task
-            t = t + 1
-            current = current + 1
-            if current > n:
-                current = current - n
-        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(current) + '.json')
-        current_service = json.load(file)
-        task = {'task': t, 'outputs': current_service['outputs'], 'inputs': current_service['inputs']}
-        tasks['task_' + str(t)] = task
+    for node in dag:
+        file = open('./datasets/descriptions/' + str(n) + '-services/services/service_' + str(node) + '.json')
+        predecessors = dag.predecessors(node)
+        predecessors = list(dict.fromkeys(predecessors))
+        successors = dag.successors(node)
+        successors = list(dict.fromkeys(successors))
+        service = json.load(file)
+        task = {'task': str(node), 'outputs': service['outputs'], 'inputs': service['inputs'], 'predecessors': predecessors,
+                'successors': successors}
+        tasks['task_' + str(node)] = task
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
-    conversation_template['name'] = name
-    if not os.path.exists(output):
-        with open(output, 'w') as f:
+    conversation_template['name'] = 'request_' + str(req)
+    if not os.path.exists(request_file):
+        with open(request_file, 'w') as f:
             json.dump(conversation_template, f, indent=2)
 
 

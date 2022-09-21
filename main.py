@@ -1,6 +1,5 @@
-"""import time
+import time
 import json
-import random
 import os
 import sys
 import pandas as pd
@@ -12,9 +11,9 @@ import microservices.logic.util as util
 from clients.producer import Producer
 from clients.consumer import Consumer
 from baselines import backward_planning
-from baselines import conversations"""
+from baselines import conversations
 from datasets import generator
-#from results import plotting
+from results import plotting
 
 
 # experimental setup variables
@@ -26,7 +25,7 @@ results_file = ''
 
 
 # writes results file
-"""def save(file_name, res, fmt):
+def save(file_name, res, fmt):
     df = pd.DataFrame.from_dict(res)
     df = df.drop(columns=['request_time', 'response_time'])
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
@@ -228,6 +227,5 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')"""
+        print('Please provide the experiments parameters file path in the correct format...')
 
-generator.create_dataset('./datasets/descriptions/', 50, 40, 10, [10])

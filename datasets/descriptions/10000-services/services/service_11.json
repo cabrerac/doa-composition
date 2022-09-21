@@ -7,7 +7,11 @@
   ],
   "inputs": [
     {
-      "name": "_OUTPUT_SERVICE_10",
+      "name": "_OUTPUT_SERVICE_0",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_8",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
