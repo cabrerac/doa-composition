@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import pandas as pd
+import networkx as nx
 
 from deployment import deploy_to_aws
 from clients import client
@@ -80,22 +81,10 @@ def conversation_composition(external_url, request, n, le):
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
-    plan = conversations.create_plan(request)
+    request, plan = conversations.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
     measurement['request_time'] = int(round(time.time() * 1000))
-    tasks = plan['tasks']
-    index = 1
-    task = tasks['task_1']
-    parameters = {'inputs': task['inputs']}
-    responses = []
-    while index <= len(tasks):
-        task = tasks['task_' + str(index)]
-        service = task['services'][0]
-        print('requesting service: ' + service['path'])
-        response = client.make_request(external_url, service['path'], parameters)
-        parameters['inputs'] = response.json()['outputs']
-        responses.append(response)
-        index = index + 1
+    responses = conversations.execute_plan(request, plan)
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
@@ -195,14 +184,14 @@ def main(parameters_file):
                     request_file = requests[i]
                     if approach == 'doa':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
-                        doa_composition(request, services_number, length)
+                        #doa_composition(request, services_number, length)
                     if approach == 'planning':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
-                        planning_composition(external_url, request, services_number, length)
+                        #planning_composition(external_url, request, services_number, length)
                     if approach == 'conversation':
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
-                    time.sleep(2)
+                        time.sleep(2)
                     i = i + 1
         data_access.remove_services()
     # removing services from AWS

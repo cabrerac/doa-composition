@@ -19,7 +19,7 @@
         1,
         2,
         3,
-        25
+        22
       ]
     },
     "task_1": {
@@ -86,11 +86,11 @@
       ],
       "successors": []
     },
-    "task_25": {
-      "task": "25",
+    "task_22": {
+      "task": "22",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_25",
+          "name": "_OUTPUT_SERVICE_22",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],

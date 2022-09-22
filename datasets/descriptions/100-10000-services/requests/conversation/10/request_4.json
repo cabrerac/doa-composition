@@ -19,10 +19,10 @@
         1,
         2,
         3,
-        4,
-        7,
-        9,
-        25
+        14,
+        19,
+        21,
+        22
       ]
     },
     "task_1": {
@@ -43,7 +43,7 @@
         0
       ],
       "successors": [
-        23
+        4
       ]
     },
     "task_2": {
@@ -66,6 +66,7 @@
       "successors": [
         3,
         4,
+        5,
         19
       ]
     },
@@ -91,7 +92,9 @@
         0,
         2
       ],
-      "successors": []
+      "successors": [
+        5
+      ]
     },
     "task_4": {
       "task": "4",
@@ -103,7 +106,7 @@
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_0",
+          "name": "_OUTPUT_SERVICE_1",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
@@ -112,18 +115,42 @@
         }
       ],
       "predecessors": [
-        0,
+        1,
         2
       ],
-      "successors": [
-        7
-      ]
+      "successors": []
     },
-    "task_7": {
-      "task": "7",
+    "task_5": {
+      "task": "5",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_7",
+          "name": "_OUTPUT_SERVICE_5",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_2",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        },
+        {
+          "name": "_OUTPUT_SERVICE_3",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "predecessors": [
+        2,
+        3
+      ],
+      "successors": [
+        14
+      ]
+    },
+    "task_14": {
+      "task": "14",
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_14",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
@@ -133,39 +160,13 @@
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_4",
+          "name": "_OUTPUT_SERVICE_5",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
         0,
-        4
-      ],
-      "successors": [
-        9
-      ]
-    },
-    "task_9": {
-      "task": "9",
-      "outputs": [
-        {
-          "name": "_OUTPUT_SERVICE_9",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "inputs": [
-        {
-          "name": "_OUTPUT_SERVICE_0",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        },
-        {
-          "name": "_OUTPUT_SERVICE_7",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "predecessors": [
-        0,
-        7
+        5
       ],
       "successors": []
     },
@@ -179,47 +180,48 @@
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_2",
+          "name": "_OUTPUT_SERVICE_0",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_6",
+          "name": "_OUTPUT_SERVICE_2",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
+        0,
         2
       ],
       "successors": []
     },
-    "task_23": {
-      "task": "23",
+    "task_21": {
+      "task": "21",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_23",
+          "name": "_OUTPUT_SERVICE_21",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_1",
+          "name": "_OUTPUT_SERVICE_0",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_20",
+          "name": "_OUTPUT_SERVICE_13",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
-        1
+        0
       ],
       "successors": []
     },
-    "task_25": {
-      "task": "25",
+    "task_22": {
+      "task": "22",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_25",
+          "name": "_OUTPUT_SERVICE_22",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
