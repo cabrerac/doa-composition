@@ -165,16 +165,14 @@ def main(parameters_file):
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
     print('2. Creating experiment datasets...')
-    created_services = generator.create_dataset(dataset_path, services, deployable_services, requests_number, lengths)
-    print(str(created_services))
-    services_number = max(services)
+    created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = generator.get_services('async', services_number, created_services, 1)
+    services_async = generator.get_services('async', experiment, created_services, 1)
     #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     #rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = generator.get_services('sync', services_number, created_services, len(services_async) + 1)
+    services_sync = generator.get_services('sync', experiment, created_services, len(services_async) + 1)
     #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
@@ -182,13 +180,13 @@ def main(parameters_file):
     print('4. Running experiments...')
     for services_number in services:
         print('- Registering services: ' + str(services_number))
-        registry_services = generator.get_services('sync', services_number, created_services, len(services_async) + 1)
+        registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services, len(services_async) + 1)
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
-            all_requests[length] = generator.get_requests(dataset_path, services_number, experiment_requests, length)
-        print('- Requesting services for experiment with' + str(services_number) + ' services...')
+            all_requests[length] = generator.get_requests(dataset_path, experiment, experiment_requests, length)
+        print('- Requesting services for experiment with ' + str(services_number) + ' services...')
         for approach in approaches:
             for length in lengths:
                 requests = all_requests[length]
@@ -196,13 +194,13 @@ def main(parameters_file):
                 while i < experiment_requests:
                     request_file = requests[i]
                     if approach == 'doa':
-                        request = generator.get_request(dataset_path, services_number, 'goal', length, request_file)
+                        request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
-                        request = generator.get_request(dataset_path, services_number, 'goal', length, request_file)
+                        request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         planning_composition(external_url, request, services_number, length)
                     if approach == 'conversation':
-                        request = generator.get_request(dataset_path, services_number, 'conversation', length, request_file)
+                        request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     time.sleep(2)
                     i = i + 1
@@ -213,7 +211,7 @@ def main(parameters_file):
     #deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
-    plotting.plot_results(parameters)
+    #plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     #time.sleep(600)
     # removing AWS resources

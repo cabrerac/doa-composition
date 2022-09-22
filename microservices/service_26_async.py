@@ -18,7 +18,7 @@ def callback(ch, method, properties, body):
     user_topic = message['user_topic']
     expected_output = message['expected_output']
     messages_size = message['messages_size']
-    ms = 0.0051
+    ms = 0.0012
     time.sleep(ms)
     outputs = description['outputs']
     for output in outputs:
