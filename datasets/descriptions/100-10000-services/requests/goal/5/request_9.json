@@ -5,14 +5,19 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_5",
+      "name": "_OUTPUT_SERVICE_3",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_39",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
   "inputs": [
     {
       "name": "_INPUT_SERVICE_0",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+      "value": "User input for request 9"
     }
   ],
   "name": "request_9"

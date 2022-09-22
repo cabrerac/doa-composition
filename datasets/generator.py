@@ -192,10 +192,10 @@ def _create_conversation_request(experiment, length, req, dag):
         if len(predecessors) == 0:
             if node not in inputs.keys():
                 inps = []
-                for inp in inputs:
+                for inp in service['inputs']:
                     inp['value'] = 'User input for request ' + str(req)
                     inps.append(inp)
-                inputs[node] = inps
+                inputs[int(node)] = inps
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks

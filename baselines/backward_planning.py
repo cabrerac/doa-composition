@@ -1,6 +1,7 @@
 from registry import data_access
 import networkx as nx
 import random
+import time
 
 from clients import client
 
@@ -23,20 +24,27 @@ def create_plan(request):
 
 
 def _backward_planning(inputs, outputs, graph, services, node):
+    print(graph.edges)
+    print(inputs)
+    print(outputs)
+    #time.sleep(5)
     if inputs != outputs:
         for output in outputs:
             query = {'outputs.name': output['name']}
             services = data_access.get_services(query)
-            for service in service:
+            print(str(len(services)))
+            for service in services:
+                print(service)
                 graph_temp = graph.copy(as_view=False)
-                graph_temp.add_edge(service['name'], node)
-                outputs_temp = service['inputs']
-                for output_temp in outputs_temp:
+                graph_temp.add_edge(int(service['name'].split('_')[1]), node)
+                outputs_temps = service['inputs']
+                for output_temp in outputs:
                     if output_temp != output:
-                        outputs_temp.append(output)
+                        outputs_temps.append(output_temp)
                 services_temp = services
                 services_temp.append(service)
-                services, graph = _backward_planning(inputs, outputs_temp, services_temp, service['name'])
+                next_node = int(service['name'].split('_')[1])
+                services, graph = _backward_planning(inputs, outputs_temps, graph_temp, services_temp, next_node)
     else:
         return services, graph
     return services, graph

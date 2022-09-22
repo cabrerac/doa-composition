@@ -11,14 +11,16 @@
       "inputs": [
         {
           "name": "_INPUT_SERVICE_0",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+          "value": "User input for request 7"
         }
       ],
       "predecessors": [],
       "successors": [
         1,
         2,
-        3
+        3,
+        33
       ]
     },
     "task_1": {
@@ -38,9 +40,7 @@
       "predecessors": [
         0
       ],
-      "successors": [
-        16
-      ]
+      "successors": []
     },
     "task_2": {
       "task": "2",
@@ -87,17 +87,17 @@
       ],
       "successors": []
     },
-    "task_16": {
-      "task": "16",
+    "task_33": {
+      "task": "33",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_16",
+          "name": "_OUTPUT_SERVICE_33",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_1",
+          "name": "_OUTPUT_SERVICE_0",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
@@ -106,10 +106,19 @@
         }
       ],
       "predecessors": [
-        1
+        0
       ],
       "successors": []
     }
   },
-  "name": "request_7"
+  "name": "request_7",
+  "inputs": {
+    "0": [
+      {
+        "name": "_INPUT_SERVICE_0",
+        "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric",
+        "value": "User input for request 7"
+      }
+    ]
+  }
 }

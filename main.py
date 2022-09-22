@@ -174,11 +174,11 @@ def main(parameters_file):
                         #doa_composition(request, services_number, length)
                     if approach == 'planning':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
-                        #planning_composition(external_url, request, services_number, length)
+                        planning_composition(external_url, request, services_number, length)
+                        time.sleep(2)
                     if approach == 'conversation':
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
-                        conversation_composition(external_url, request, services_number, length)
-                        time.sleep(2)
+                        #conversation_composition(external_url, request, services_number, length)
                     i = i + 1
         data_access.remove_services()
     # removing services from AWS

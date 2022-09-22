@@ -10,7 +10,15 @@ def create_plan(request):
     tasks = request['tasks']
     g = nx.Graph()
     for key, task in tasks.items():
-        query = {'outputs': task['outputs'], 'inputs': task['inputs']}
+        outputs_names = []
+        for output in task['outputs']:
+            if output['name'] not in outputs_names:
+                outputs_names.append(output['name'])
+        inputs_names = []
+        for input in task['inputs']:
+            if input['name'] not in inputs_names:
+                inputs_names.append(input['name'])
+        query = {'outputs.name': {'$in': outputs_names}, 'inputs.name': {'$in': inputs_names}}
         services = data_access.get_services(query)
         task['services'] = services
         tasks[key] = task
@@ -57,7 +65,7 @@ def execute_plan(request, plan, external_url):
                 print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
-                    parameters = {'inputs': request['inputs'][value]}
+                    parameters = {'inputs': request['inputs'][str(value)]}
                 else:
                     inputs = []
                     for predecessor in predecessors:
@@ -65,10 +73,10 @@ def execute_plan(request, plan, external_url):
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
-                print(parameters)
-                response = client.make_request(external_url, service['path'], parameters)
-                responses.append(response)
-                outputs[value] = response.json()['outputs']
+                #response = client.make_request(external_url, service['path'], parameters)
+                #responses.append(response)
+                #outputs[value] = response.json()['outputs']
+                outputs[value] = 'output'
                 executed.append(value)
         index = index + 1
     return responses
