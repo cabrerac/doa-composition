@@ -31,11 +31,11 @@ def create_plan(request):
         if len(predecessors) == 0:
             if node not in sources:
                 sources.append(node)
-    print(dag.edges)
+    plan = dict(enumerate(nx.bfs_layers(dag, sources)))
     return request, plan
 
 
-def execute_plan(request, plan):
+def execute_plan(request, plan, external_url):
     print('- executing plan...')
     index = 0
     outputs = {}
@@ -57,7 +57,7 @@ def execute_plan(request, plan):
                 print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
-                    parameters = {'inputs': task['inputs']}
+                    parameters = {'inputs': request['inputs'][value]}
                 else:
                     inputs = []
                     for predecessor in predecessors:

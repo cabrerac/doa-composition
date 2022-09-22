@@ -155,6 +155,7 @@ def _create_goal_request(experiment, length, req, dag):
         service = json.load(file)
         for inp in service['inputs']:
             if inp not in inputs:
+                inp['value'] = 'User input for request ' + str(req)
                 inputs.append(inp)
     outputs = []
     for node in lasts:
@@ -177,6 +178,7 @@ def _create_goal_request(experiment, length, req, dag):
 def _create_conversation_request(experiment, length, req, dag):
     request_file = './datasets/descriptions/' + experiment + '/requests/conversation/' + str(length) + '/request_' + str(req) + '.json'
     tasks = {}
+    inputs = {}
     for node in dag:
         file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
         predecessors = dag.predecessors(node)
@@ -187,10 +189,18 @@ def _create_conversation_request(experiment, length, req, dag):
         task = {'task': str(node), 'outputs': service['outputs'], 'inputs': service['inputs'], 'predecessors': predecessors,
                 'successors': successors}
         tasks['task_' + str(node)] = task
+        if len(predecessors) == 0:
+            if node not in inputs.keys():
+                inps = []
+                for inp in inputs:
+                    inp['value'] = 'User input for request ' + str(req)
+                    inps.append(inp)
+                inputs[node] = inps
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
     conversation_template['name'] = 'request_' + str(req)
+    conversation_template['inputs'] = inputs
     if not os.path.exists(request_file):
         with open(request_file, 'w') as f:
             json.dump(conversation_template, f, indent=2)

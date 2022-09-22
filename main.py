@@ -3,7 +3,6 @@ import json
 import os
 import sys
 import pandas as pd
-import networkx as nx
 
 from deployment import deploy_to_aws
 from clients import client
@@ -84,7 +83,7 @@ def conversation_composition(external_url, request, n, le):
     request, plan = conversations.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
     measurement['request_time'] = int(round(time.time() * 1000))
-    responses = conversations.execute_plan(request, plan)
+    responses = conversations.execute_plan(request, plan, external_url)
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
@@ -98,28 +97,16 @@ def conversation_composition(external_url, request, n, le):
 
 # planning based composition approach
 def planning_composition(external_url, request, n, le):
-    print(request)
-    print(str(sys.getsizeof(str(request))))
     req_id = 'planning_' + str(len(metrics) + 1)
     print('Request Planning: ' + req_id + ' ::: ' + request['name'] )
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'planning', 'services': n, 'length': le,
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
-    plan = backward_planning.create_plan(request)
+    services, plan = backward_planning.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
     measurement['request_time'] = int(round(time.time() * 1000))
-    services = plan['services']
-    index = len(services)
-    parameters = {'inputs': request['inputs']}
-    responses = []
-    while index >= 1:
-        service = services[index]
-        print('requesting service: ' + service['path'])
-        response = client.make_request(external_url, service['path'], parameters)
-        parameters['inputs'] = response.json()['outputs']
-        responses.append(response)
-        index = index - 1
+    responses = backward_planning.execute_plan(services, plan, external_url)
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
