@@ -1,6 +1,10 @@
 {
   "outputs": [
     {
+      "name": "_OUTPUT_SERVICE_2",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
       "name": "_OUTPUT_SERVICE_4",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
@@ -9,15 +13,11 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_12",
+      "name": "_OUTPUT_SERVICE_11",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_14",
-      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-    },
-    {
-      "name": "_OUTPUT_SERVICE_23",
+      "name": "_OUTPUT_SERVICE_29",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],

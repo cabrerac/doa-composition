@@ -130,8 +130,9 @@ def create_services_requests(r, lengths, dag, experiment):
                 break
         req = 0
         for request in requests:
-            _create_goal_request(experiment, length, req, request)
-            _create_conversation_request(experiment, length, req, request)
+            valid = _create_conversation_request(experiment, length, req, request)
+            if valid:
+                _create_goal_request(experiment, length, req, request)
             req = req + 1
 
 
@@ -176,6 +177,7 @@ def _create_goal_request(experiment, length, req, dag):
 
 # creates request for conversation-based approach
 def _create_conversation_request(experiment, length, req, dag):
+    valid = True
     request_file = './datasets/descriptions/' + experiment + '/requests/conversation/' + str(length) + '/request_' + str(req) + '.json'
     tasks = {}
     inputs = {}
@@ -196,14 +198,19 @@ def _create_conversation_request(experiment, length, req, dag):
                     inp['value'] = 'User input for request ' + str(req)
                     inps.append(inp)
                 inputs[int(node)] = inps
+        for inp in service['inputs']:
+            nod = inp['name'].split('_')[3]
+            if nod not in dag.nodes:
+                valid = True
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
     conversation_template['name'] = 'request_' + str(req)
     conversation_template['inputs'] = inputs
-    if not os.path.exists(request_file):
+    if valid and not os.path.exists(request_file):
         with open(request_file, 'w') as f:
             json.dump(conversation_template, f, indent=2)
+    return valid
 
 
 # defines services to deploy in the AWS infrastructure

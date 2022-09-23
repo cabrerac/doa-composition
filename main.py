@@ -106,7 +106,7 @@ def planning_composition(external_url, request, n, le):
     services, plan = backward_planning.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
     measurement['request_time'] = int(round(time.time() * 1000))
-    responses = backward_planning.execute_plan(services, plan, external_url)
+    responses = backward_planning.execute_plan(request, services, plan, external_url)
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
@@ -136,9 +136,10 @@ def main(parameters_file):
 
     # deploying AWS resources
     print('1. Deploying resources...')
-    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
-    print('Load Balancer URL: ' + external_url)
-    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    #external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
+    #print('Load Balancer URL: ' + external_url)
+    #print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    external_url = ''
 
     print('2. Creating experiment datasets...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
