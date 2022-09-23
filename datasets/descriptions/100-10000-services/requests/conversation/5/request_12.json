@@ -19,8 +19,7 @@
       "successors": [
         1,
         2,
-        3,
-        29
+        3
       ]
     },
     "task_1": {
@@ -40,9 +39,7 @@
       "predecessors": [
         0
       ],
-      "successors": [
-        3
-      ]
+      "successors": []
     },
     "task_2": {
       "task": "2",
@@ -61,7 +58,10 @@
       "predecessors": [
         0
       ],
-      "successors": []
+      "successors": [
+        3,
+        29
+      ]
     },
     "task_3": {
       "task": "3",
@@ -77,15 +77,17 @@
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_1",
+          "name": "_OUTPUT_SERVICE_2",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
         0,
-        1
+        2
       ],
-      "successors": []
+      "successors": [
+        29
+      ]
     },
     "task_29": {
       "task": "29",
@@ -97,16 +99,17 @@
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_0",
+          "name": "_OUTPUT_SERVICE_2",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_7",
+          "name": "_OUTPUT_SERVICE_3",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
-        0
+        2,
+        3
       ],
       "successors": []
     }

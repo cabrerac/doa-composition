@@ -11,7 +11,7 @@ def create_plan(request):
     inputs = []
     for inp in request['inputs']:
         inputs.append({'name': inp['name'], 'type': inp['type']})
-    plan = {'graph': nx.Graph(), 'inputs': inputs, 'outputs': outputs, 'services': [], 'finished': False}
+    plan = {'graph': nx.DiGraph(), 'inputs': inputs, 'outputs': outputs, 'services': [], 'finished': False}
     plans = [plan]
     plans = _backward_planning(plans)
     """dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
