@@ -125,7 +125,17 @@ def create_services_requests(r, lengths, dag, experiment):
         for nodes in combinations(dag.nodes, length):
             dag_sub = dag.subgraph(nodes)
             if nx.is_weakly_connected(dag_sub):
-                requests.append(dag_sub)
+                add = True
+                for node in dag_sub.nodes:
+                	predecessors = list(dict.fromkeys(predecessors))
+                        for predecessor in predecessors:
+                            if predecessor not in nodes:
+                                add = False
+                                break
+                        if not add:
+                            break
+                if add:
+                    requests.append(dag_sub)
             if len(requests) >= r:
                 break
         req = 0
