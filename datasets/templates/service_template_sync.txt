@@ -6,15 +6,17 @@ from logic import util
 description = util.read_service_description('./description/<service>.json')
 
 
-# Flask interface
+# flask interface
 app = Flask('__name__')
 
 
+# microservice endpoint
 @app.route('/doa_composition/<service>_sync', methods=['GET', 'POST'])
 def <service>_sync():
     try:
         parameters = request.get_json()
         ms = <time>
+        inputs = parameters['inputs']
         time.sleep(ms)
         outputs = description['outputs']
         for output in outputs:

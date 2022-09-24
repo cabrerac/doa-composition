@@ -91,12 +91,12 @@ def _finished(plans):
     return False
 
 
-# compares inputs and outputs
-def _compare(inputs, outputs):
-    if len(inputs) == len(outputs):
+# compares two lists of parameters
+def _compare(pars_1, pars_2):
+    if len(pars_1) == len(pars_2):
        index = 0
-       while index < len(inputs):
-           if inputs[index]['name'] != outputs[index]['name']:
+       while index < len(pars_1):
+           if pars_1[index]['name'] != pars_2[index]['name']:
                return False
            index = index + 1
     else:

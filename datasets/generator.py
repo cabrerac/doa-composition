@@ -18,7 +18,7 @@ def create_dataset(path, experiment, deployable_services, requests_number, lengt
     print('- Creating services implementations for experiment ' + experiment + '...')
     create_services_implementations(experiment, dag)
     print('- Creating services requests for experiment ' + experiment + '...')
-    create_services_requests(requests_number, lengths, dag, experiment)
+    create_services_requests(requests_number, lengths, dag, experiment, path, deployable_services)
     return list(dag.nodes)
 
 
@@ -98,7 +98,7 @@ def create_services_implementations(experiment, dag):
 
 
 # creates r requests for lengths based on a dag for a given experiment 
-def create_services_requests(r, lengths, dag, experiment):
+def create_services_requests(r, lengths, dag, experiment, path, deployable_services):
     Path('./datasets/descriptions/' + experiment + '/requests/goal').mkdir(parents=True, exist_ok=True)
     Path('./datasets/descriptions/' + experiment + '/requests/conversation').mkdir(parents=True, exist_ok=True)
     for length in lengths:
@@ -123,12 +123,16 @@ def create_services_requests(r, lengths, dag, experiment):
                     requests.append(dag_sub)
             if len(requests) >= r:
                 break
-        req = 0
-        for request in requests:
-            valid = _create_conversation_request(experiment, length, req, request)
-            if valid:
+        if len(requests) == r:
+            req = 0
+            for request in requests:
+                _create_conversation_request(experiment, length, req, request)
                 _create_goal_request(experiment, length, req, request)
-            req = req + 1
+                req = req + 1
+        else:
+            print('Not enought requests in graph...')
+            print('Recreating dataset...')
+            create_dataset(path, experiment, deployable_services, r, lengths)
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
@@ -172,7 +176,6 @@ def _create_goal_request(experiment, length, req, dag):
 
 # creates request for conversation-based approach
 def _create_conversation_request(experiment, length, req, dag):
-    valid = True
     request_file = './datasets/descriptions/' + experiment + '/requests/conversation/' + str(length) + '/request_' + str(req) + '.json'
     tasks = {}
     inputs = {}
@@ -193,19 +196,14 @@ def _create_conversation_request(experiment, length, req, dag):
                     inp['value'] = 'User input for request ' + str(req)
                     inps.append(inp)
                 inputs[int(node)] = inps
-        for inp in service['inputs']:
-            nod = inp['name'].split('_')[3]
-            if nod not in dag.nodes:
-                valid = True
     file = open('./datasets/templates/conversation_request_template.json')
     conversation_template = json.load(file)
     conversation_template['tasks'] = tasks
     conversation_template['name'] = 'request_' + str(req)
     conversation_template['inputs'] = inputs
-    if valid and not os.path.exists(request_file):
+    if not os.path.exists(request_file):
         with open(request_file, 'w') as f:
             json.dump(conversation_template, f, indent=2)
-    return valid
 
 
 # defines services to deploy in the AWS infrastructure
