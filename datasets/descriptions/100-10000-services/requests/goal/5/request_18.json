@@ -1,11 +1,11 @@
 {
   "outputs": [
     {
-      "name": "_OUTPUT_SERVICE_19",
+      "name": "_OUTPUT_SERVICE_35",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_30",
+      "name": "_OUTPUT_SERVICE_20",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],

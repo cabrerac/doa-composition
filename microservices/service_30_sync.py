@@ -15,7 +15,7 @@ app = Flask('__name__')
 def service_30_sync():
     try:
         parameters = request.get_json()
-        ms = 0.0058
+        ms = 0.005
         inputs = parameters['inputs']
         time.sleep(ms)
         outputs = description['outputs']

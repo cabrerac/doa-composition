@@ -22,11 +22,11 @@ def callback(ch, method, properties, body):
         inputs = requests[req_id]
     for output in message['outputs']:
         inputs.append(output)
-    if _compare(inputs, description['inputs'])
+    if _compare(inputs, description['inputs']):
         user_topic = message['user_topic']
         expected_output = message['expected_output']
         messages_size = message['messages_size']
-        ms = 0.0084
+        ms = 0.0092
         time.sleep(ms)
         outputs = description['outputs']
         for output in outputs:
