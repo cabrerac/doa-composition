@@ -9,17 +9,24 @@ from itertools import combinations
 
 # creates experiment dataset
 def create_dataset(path, experiment, deployable_services, requests_number, lengths):
-    g = nx.barabasi_albert_graph(deployable_services, 2)
-    dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
-    if os.path.exists(path + experiment + '/'):
-        shutil.rmtree(path + experiment + '/')
-    print('- Creating services and requests for experiment ' + experiment + '...')
-    create_services_descriptions(experiment, dag)
-    print('- Creating services implementations for experiment ' + experiment + '...')
-    create_services_implementations(experiment, dag)
-    print('- Creating services requests for experiment ' + experiment + '...')
-    create_services_requests(requests_number, lengths, dag, experiment, path, deployable_services)
-    return list(dag.nodes)
+    if not os.path.exists(path + experiment + '/'):
+        g = nx.barabasi_albert_graph(deployable_services, 2)
+        dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
+        print('- Creating services and requests for experiment ' + experiment + '...')
+        create_services_descriptions(experiment, dag)
+        print('- Creating services implementations for experiment ' + experiment + '...')
+        create_services_implementations(experiment, dag)
+        print('- Creating services requests for experiment ' + experiment + '...')
+        create_services_requests(requests_number, lengths, dag, experiment, path, deployable_services)
+        return list(dag.nodes)
+    else:
+        created_services = []
+        print('- Dataset already exists...')
+        files = os.listdir(path + experiment + '/services/')
+        print(files)
+        for file in files:
+            created_services.append(file.split('.')[0].split('_')[1])
+        return created_services
 
 
 # creates n services
@@ -28,6 +35,8 @@ def create_services_descriptions(experiment, dag):
     Path('./datasets/descriptions/' + experiment + '/services').mkdir(parents=True, exist_ok=True)
     Path('./datasets/descriptions/' + experiment + '/requests').mkdir(parents=True, exist_ok=True)
     services = 0
+    priority_async = 0
+    priority_sync = 1
     for node in dag.nodes:
         file = open('./datasets/templates/service_template.json')
         service_template = json.load(file)
@@ -43,11 +52,15 @@ def create_services_descriptions(experiment, dag):
                 inputs.append(inp)
             service_template['inputs'] = inputs
         service_template['outputs'][0]['name'] = '_OUTPUT_SERVICE_' + str(node)
+        service_template['priority_async'] = priority_async
+        service_template['priority_sync'] = priority_sync
         service_template['name'] = 'service_' + str(node)
         service_template['description'] = 'This is the service ' + str(node)
         with open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json','w') as f:
             json.dump(service_template, f, indent=2)
         services = services + 1
+        priority_async = priority_async + 2
+        priority_sync = priority_sync + 2
 
 
 # creates services implementation for m services
@@ -208,7 +221,7 @@ def _create_conversation_request(experiment, length, req, dag):
 
 
 # defines services to deploy in the AWS infrastructure
-def get_services(service_type, experiment, created_services, priority):
+def get_services(service_type, experiment, created_services):
     services = []
     for node in created_services:
         file = open('./datasets/descriptions/' + experiment + '/services/service_'+str(node)+'.json')
@@ -219,15 +232,17 @@ def get_services(service_type, experiment, created_services, priority):
         service['cpu'] = 256
         service['memory'] = 512
         service['path'] = '/doa_composition/' + service['name']
-        service['priority'] = priority
+        if service_type == 'async'
+            service['priority'] = service['priority_async']
+        if service_type == 'sync'
+            service['priority'] = service['priority_sync']
         service['count'] = 1
         services.append(service)
-        priority = priority + 1
     return services
 
 
 # defines services to register in db
-def get_services_to_register(service_type, experiment, services_number, created_services, priority):
+def get_services_to_register(service_type, experiment, services_number, created_services):
     services = []
     for node in created_services:
         file = open('./datasets/descriptions/' + experiment + '/services/service_'+str(node)+'.json')
@@ -238,10 +253,12 @@ def get_services_to_register(service_type, experiment, services_number, created_
         service['cpu'] = 256
         service['memory'] = 512
         service['path'] = '/doa_composition/' + service['name']
-        service['priority'] = priority
+        if service_type == 'async'
+            service['priority'] = service['priority_async']
+        if service_type == 'sync'
+            service['priority'] = service['priority_sync']
         service['count'] = 1
         services.append(service)
-        priority = priority + 1
     while len(services) < services_number:
         file = open('./datasets/templates/service_template.json')
         service_template = json.load(file)

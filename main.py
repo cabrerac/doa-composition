@@ -139,17 +139,17 @@ def main(parameters_file):
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
-    external_url = ''
 
-    print('2. Creating experiment datasets...')
+    print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
+    print(created_services)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
-    services_async = generator.get_services('async', experiment, created_services, 1)
+    services_async = generator.get_services('async', experiment, created_services)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
     rabbit_doa_consumer()
     print('- Deploying synchronous services')
-    services_sync = generator.get_services('sync', experiment, created_services, len(services_async) + 1)
+    services_sync = generator.get_services('sync', experiment, created_services)
     deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
@@ -157,7 +157,7 @@ def main(parameters_file):
     print('4. Running experiments...')
     for services_number in services:
         print('- Registering services: ' + str(services_number))
-        registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services, len(services_async) + 1)
+        registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
         data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
@@ -202,4 +202,3 @@ if __name__ == "__main__":
         main(sys.argv[1])
     else:
         print('Please provide the experiments parameters file path in the correct format...')
-
