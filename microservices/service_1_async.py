@@ -12,6 +12,8 @@ rabbit_credentials_file = 'rabbit-mq.yaml'
 description = util.read_service_description('./description/service_1.json')
 requests = {}
 
+
+# callback to process asynchronous messages
 def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
@@ -24,7 +26,7 @@ def callback(ch, method, properties, body):
         user_topic = message['user_topic']
         expected_output = message['expected_output']
         messages_size = message['messages_size']
-        ms = 0.0072
+        ms = 0.002
         time.sleep(ms)
         outputs = description['outputs']
         for output in outputs:
@@ -60,6 +62,7 @@ def _compare(pars_1, pars_2):
     return True
 
 
+# creates a messages listener per each service input
 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
 inputs = description['inputs']
 for inp in inputs:
@@ -67,10 +70,11 @@ for inp in inputs:
     consumer_thread.start()
 
 
-# Flask interface
+# flask interface
 app = Flask('__name__')
 
 
+# single endpoint to pass AWS health checks
 @app.route('/doa_composition/service_1_async', methods=['GET', 'POST'])
 def service_1_async():
     try:

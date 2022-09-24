@@ -133,6 +133,7 @@ def create_services_requests(r, lengths, dag, experiment, path, deployable_servi
             print('Not enought requests in graph...')
             print('Recreating dataset...')
             create_dataset(path, experiment, deployable_services, r, lengths)
+            break
 
 
 # creates request for goal-driven approaches (i.e., planning and doa)
