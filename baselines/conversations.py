@@ -5,6 +5,7 @@ import random
 from clients import client
 
 
+# creates plan for the request
 def create_plan(request):
     print('- creating plan...')
     tasks = request['tasks']
@@ -43,6 +44,7 @@ def create_plan(request):
     return request, plan
 
 
+# executes a composition plan
 def execute_plan(request, plan, external_url):
     print('- executing plan...')
     index = 0
@@ -57,7 +59,10 @@ def execute_plan(request, plan, external_url):
             ready = True
             for predecessor in predecessors:
                 if predecessor not in executed:
-                    plan[index+1].append(value)
+                    if (index + 1) in plan:
+                        plan[index+1].append(value)
+                    else:
+                        plan[index+1] = [value]
                     ready = False
                     break
             if ready:
@@ -73,10 +78,9 @@ def execute_plan(request, plan, external_url):
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
-                #response = client.make_request(external_url, service['path'], parameters)
-                #responses.append(response)
-                #outputs[value] = response.json()['outputs']
-                outputs[value] = 'output'
+                response = client.make_request(external_url, service['path'], parameters)
+                responses.append(response)
+                outputs[value] = response.json()['outputs']
                 executed.append(value)
         index = index + 1
     return responses

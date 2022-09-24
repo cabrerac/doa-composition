@@ -17,29 +17,11 @@
       ],
       "predecessors": [],
       "successors": [
-        1,
         2,
-        3
+        3,
+        5,
+        8
       ]
-    },
-    "task_1": {
-      "task": "1",
-      "outputs": [
-        {
-          "name": "_OUTPUT_SERVICE_1",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "inputs": [
-        {
-          "name": "_OUTPUT_SERVICE_0",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "predecessors": [
-        0
-      ],
-      "successors": []
     },
     "task_2": {
       "task": "2",
@@ -59,8 +41,7 @@
         0
       ],
       "successors": [
-        3,
-        12
+        3
       ]
     },
     "task_3": {
@@ -85,28 +66,56 @@
         0,
         2
       ],
-      "successors": []
+      "successors": [
+        5,
+        8
+      ]
     },
-    "task_12": {
-      "task": "12",
+    "task_5": {
+      "task": "5",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_12",
+          "name": "_OUTPUT_SERVICE_5",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_2",
+          "name": "_OUTPUT_SERVICE_0",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_4",
+          "name": "_OUTPUT_SERVICE_3",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
-        2
+        0,
+        3
+      ],
+      "successors": []
+    },
+    "task_8": {
+      "task": "8",
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_8",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_0",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        },
+        {
+          "name": "_OUTPUT_SERVICE_3",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "predecessors": [
+        0,
+        3
       ],
       "successors": []
     }

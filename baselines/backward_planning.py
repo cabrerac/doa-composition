@@ -6,72 +6,64 @@ import time
 from clients import client
 
 
+# creates plan for the request
 def create_plan(request):
     outputs = request['outputs']
     inputs = []
     for inp in request['inputs']:
         inputs.append({'name': inp['name'], 'type': inp['type']})
-    plan = {'graph': nx.DiGraph(), 'inputs': inputs, 'outputs': outputs, 'services': [], 'finished': False}
+    plan = {'graph': nx.DiGraph(), 'inputs': inputs, 'outputs': outputs, 'services': {}, 'finished': False}
     plans = [plan]
     plans = _backward_planning(plans)
-    """dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
-    sources = []
-    for node in dag.nodes:
-        predecessors = dag.predecessors(node)
-        predecessors = list(dict.fromkeys(predecessors))
-        if len(predecessors) == 0:
-            if node not in sources:
-                sources.append(node)
-    plan = dict(enumerate(nx.bfs_layers(dag, sources)))
-    return services, plan"""
+    for plan in plans:
+        if plan['finished']:
+            services = plan['services']
+            graph = plan['graph']
+            dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in graph.edges() if u < v])
+            sources = []
+            for node in dag.nodes:
+                predecessors = dag.predecessors(node)
+                predecessors = list(dict.fromkeys(predecessors))
+                if len(predecessors) == 0:
+                    if node not in sources:
+                        sources.append(node)
+            plan = dict(enumerate(nx.bfs_layers(dag, sources)))
+            return services, graph, plan
 
 
+# backward planning algorithm to discover composition of services by matching outputs and inputs
 def _backward_planning(plans):
-    var = input("Please enter something: ")
     if _finished(plans):
         return plans
     else:
         temp_plans = []
         for plan in plans:
-            temp_plan = {'inputs': plan['inputs'], 'graph': plan['graph'].copy(as_view=False), 'services': []}
-            for ser in plan['services']:
-                if ser not in temp_plan['services']:
-                    temp_plan['services'].append(ser)
-            print('*** NODES... ***')
-            print(plan['graph'].nodes)
-            print('*** EDGES... ***')
-            print(plan['graph'].edges)
-            print('*** INPUTS/OUTPUTS ***')
+            temp_plan = {'inputs': plan['inputs'], 'graph': plan['graph'].copy(as_view=False), 'services': {}}
+            for key, ser in plan['services'].items():
+                if key not in temp_plan['services']:
+                    temp_plan['services'][key] = ser
             inputs = plan['inputs']
-            print(inputs)
             outputs = plan['outputs']
-            print(outputs)
             for output in outputs:
                 query = {'outputs.name': output['name']}
                 services = data_access.get_services(query)
-                print('*** RETURNED SERVICES  ***')
-                print(str(len(services)))
                 if len(services) > 0:
                     service = services[0]
-                    print('*** SERVICE... ***')
-                    print(service['name'])
-                    services_temp = []
-                    for ser in temp_plan['services']:
-                        services_temp.append(ser)
-                    if service not in services_temp:
-                        services_temp.append(service)
+                    services_temp = {}
+                    for key, ser in temp_plan['services'].items():
+                        services_temp[key] = ser
+                    if service['name'].split('_')[1] not in services_temp:
+                        services_temp[int(service['name'].split('_')[1])] = service
                     temp_plan['services'] = services_temp
                     new_node = int(service['name'].split('_')[1])
                     temp_plan['graph'].add_node(new_node)
                     nodes = []
-                    for ser in temp_plan['services']:
+                    for key, ser in temp_plan['services'].items():
                         for service_output in service['outputs']:
                             if service_output in ser['inputs']:
                                 if ser['name'].split('_')[1] not in nodes:
                                     nodes.append(ser['name'].split('_')[1])
                     for node in nodes:
-                        print('*** EDGE... ***')
-                        print(str(int(new_node)) + '-' + str(node))
                         if (int(new_node), int(node)) not in temp_plan['graph'].edges:
                             temp_plan['graph'].add_edge(int(new_node), int(node))
                     temp_outputs = []
@@ -88,8 +80,10 @@ def _backward_planning(plans):
                         temp_plan['finished'] = False 
             temp_plans.append(temp_plan)
         plans = _backward_planning(temp_plans)
+        return plans
 
 
+# validates when the backward algorithm should finish
 def _finished(plans):
     for plan in plans:
         if plan['finished'] == True:
@@ -97,6 +91,7 @@ def _finished(plans):
     return False
 
 
+# compares inputs and outputs
 def _compare(inputs, outputs):
     if len(inputs) == len(outputs):
        index = 0
@@ -109,17 +104,42 @@ def _compare(inputs, outputs):
     return True
 
 
-def execute_plan(request, services, plan, external_url):
+# executes a composition plan
+def execute_plan(request, services, graph, plan, external_url):
     print('- executing plan...')
-    index = len(services)
-    parameters = {'inputs': request['inputs']}
+    index = 0
+    outputs = {}
+    executed = []
     responses = []
-    while index >= 1:
-        service = services[index]
-        print('requesting service: ' + service['path'])
-        response = client.make_request(external_url, service['path'], parameters)
-        parameters['inputs'] = response.json()['outputs']
-        responses.append(response)
-        index = index - 1
-
-
+    while index < len(plan):
+        values = plan[index]
+        for value in values:
+            predecessors = graph.predecessors(value)
+            ready = True
+            for predecessor in predecessors:
+                if predecessor not in executed:
+                    if (index + 1) in plan:
+                        plan[index+1].append(value)
+                    else:
+                        plan[index+1] = [value]
+                    ready = False
+                    break
+            if ready:
+                service = services[value]
+                print('requesting service: ' + service['path'])
+                parameters = {}
+                if index == 0:
+                    parameters = {'inputs': request['inputs']}
+                else:
+                    inputs = []
+                    for predecessor in predecessors:
+                        if predecessor in outputs:
+                            for output in outputs[predecessor]:
+                                inputs.append(output)
+                    parameters = {'inputs': inputs}
+                response = client.make_request(external_url, service['path'], parameters)
+                responses.append(response)
+                outputs[value] = response.json()['outputs']
+                executed.append(value)
+        index = index + 1
+    return responses

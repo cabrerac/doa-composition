@@ -17,29 +17,10 @@
       ],
       "predecessors": [],
       "successors": [
-        1,
         2,
-        3
+        3,
+        7
       ]
-    },
-    "task_1": {
-      "task": "1",
-      "outputs": [
-        {
-          "name": "_OUTPUT_SERVICE_1",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "inputs": [
-        {
-          "name": "_OUTPUT_SERVICE_0",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "predecessors": [
-        0
-      ],
-      "successors": []
     },
     "task_2": {
       "task": "2",
@@ -60,7 +41,7 @@
       ],
       "successors": [
         3,
-        38
+        4
       ]
     },
     "task_3": {
@@ -85,13 +66,15 @@
         0,
         2
       ],
-      "successors": []
+      "successors": [
+        4
+      ]
     },
-    "task_38": {
-      "task": "38",
+    "task_4": {
+      "task": "4",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_38",
+          "name": "_OUTPUT_SERVICE_4",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
@@ -101,12 +84,39 @@
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_21",
+          "name": "_OUTPUT_SERVICE_3",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
-        2
+        2,
+        3
+      ],
+      "successors": [
+        7
+      ]
+    },
+    "task_7": {
+      "task": "7",
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_7",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_0",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        },
+        {
+          "name": "_OUTPUT_SERVICE_4",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "predecessors": [
+        0,
+        4
       ],
       "successors": []
     }

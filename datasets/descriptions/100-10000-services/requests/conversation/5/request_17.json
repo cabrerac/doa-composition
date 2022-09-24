@@ -17,29 +17,11 @@
       ],
       "predecessors": [],
       "successors": [
-        1,
         2,
-        3
+        3,
+        8,
+        11
       ]
-    },
-    "task_1": {
-      "task": "1",
-      "outputs": [
-        {
-          "name": "_OUTPUT_SERVICE_1",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "inputs": [
-        {
-          "name": "_OUTPUT_SERVICE_0",
-          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
-        }
-      ],
-      "predecessors": [
-        0
-      ],
-      "successors": []
     },
     "task_2": {
       "task": "2",
@@ -85,28 +67,54 @@
         2
       ],
       "successors": [
-        25
+        8,
+        11
       ]
     },
-    "task_25": {
-      "task": "25",
+    "task_8": {
+      "task": "8",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_25",
+          "name": "_OUTPUT_SERVICE_8",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "inputs": [
         {
-          "name": "_OUTPUT_SERVICE_3",
+          "name": "_OUTPUT_SERVICE_0",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         },
         {
-          "name": "_OUTPUT_SERVICE_20",
+          "name": "_OUTPUT_SERVICE_3",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],
       "predecessors": [
+        0,
+        3
+      ],
+      "successors": []
+    },
+    "task_11": {
+      "task": "11",
+      "outputs": [
+        {
+          "name": "_OUTPUT_SERVICE_11",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "_OUTPUT_SERVICE_0",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        },
+        {
+          "name": "_OUTPUT_SERVICE_3",
+          "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+        }
+      ],
+      "predecessors": [
+        0,
         3
       ],
       "successors": []

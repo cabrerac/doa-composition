@@ -56,84 +56,69 @@ def create_services_implementations(experiment, dag):
         t = random.random()
         t = t / 100
         t = round(t, 4)
-        # Writing sync services
         fin = open('./datasets/templates/service_template_sync.txt', 'rt')
         fout = open('./microservices/service_' + str(node) + '_sync.py', 'wt')
-        # for each line in the input file
         file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
         service = json.load(file)
         service_name = service['name']
         for line in fin:
-            # read replace the string and write to output file
             fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
-        # close input and output files
         fin.close()
         fout.close()
 
-        # Writing async services
         fin = open('./datasets/templates/service_template_async.txt', 'rt')
         fout = open('./microservices/service_' + str(node) + '_async.py', 'wt')
-        # for each line in the input file
         file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
         service = json.load(file)
         service_name = service['name']
         for line in fin:
-            # read replace the string and write to output file
             fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
-        # close input and output files
         fin.close()
         fout.close()
 
-        # Writing sync dockerfiles
         fin = open('./datasets/templates/docker-template-sync', 'rt')
         fout = open('./dockers/service-' + str(node) + '-sync', 'wt')
-        # for each line in the input file
         file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
         service = json.load(file)
         service_name = service['name']
         for line in fin:
-            # read replace the string and write to output file
             fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
-        # close input and output files
         fin.close()
         fout.close()
 
-        # Writing async dockerfiles
         fin = open('./datasets/templates/docker-template-async', 'rt')
         fout = open('./dockers/service-' + str(node) + '-async', 'wt')
-        # for each line in the input file
         file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
         service = json.load(file)
         service_name = service['name']
         for line in fin:
-            # read replace the string and write to output file
             fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
-        # close input and output files
         fin.close()
         fout.close()
 
 
-# creates r requests for lengths based on a dag for the experiment with n services
+# creates r requests for lengths based on a dag for a given experiment 
 def create_services_requests(r, lengths, dag, experiment):
-    # creating r requests for lengths for goal and conversations approaches
     Path('./datasets/descriptions/' + experiment + '/requests/goal').mkdir(parents=True, exist_ok=True)
     Path('./datasets/descriptions/' + experiment + '/requests/conversation').mkdir(parents=True, exist_ok=True)
     for length in lengths:
         Path('./datasets/descriptions/' + experiment + '/requests/goal/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         Path('./datasets/descriptions/' + experiment + '/requests/conversation/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         requests = []
+        print('-- Creating requests for length ' + str(length) + '...') 
         for nodes in combinations(dag.nodes, length):
             dag_sub = dag.subgraph(nodes)
             if nx.is_weakly_connected(dag_sub):
                 add = True
                 for node in dag_sub.nodes:
-                	predecessors = list(dict.fromkeys(predecessors))
-                        for predecessor in predecessors:
-                            if predecessor not in nodes:
-                                add = False
-                                break
-                        if not add:
+                    predecessors = dag.predecessors(node)
+                    predecessors = list(dict.fromkeys(predecessors))
+                    for predecessor in predecessors:
+                        if predecessor not in dag_sub.nodes:
+                            add = False
                             break
+                    if not add:
+                        break
                 if add:
                     requests.append(dag_sub)
             if len(requests) >= r:

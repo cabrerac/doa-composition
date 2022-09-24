@@ -60,7 +60,7 @@
       ],
       "successors": [
         3,
-        6
+        4
       ]
     },
     "task_3": {
@@ -86,14 +86,14 @@
         2
       ],
       "successors": [
-        6
+        4
       ]
     },
-    "task_6": {
-      "task": "6",
+    "task_4": {
+      "task": "4",
       "outputs": [
         {
-          "name": "_OUTPUT_SERVICE_6",
+          "name": "_OUTPUT_SERVICE_4",
           "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
         }
       ],

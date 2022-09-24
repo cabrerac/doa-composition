@@ -103,10 +103,10 @@ def planning_composition(external_url, request, n, le):
                    'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     metrics[req_id] = measurement
-    services, plan = backward_planning.create_plan(request)
+    services, graph, plan = backward_planning.create_plan(request)
     measurement['planning_time'] = int(round(time.time() * 1000)) - measurement['request_time']
     measurement['request_time'] = int(round(time.time() * 1000))
-    responses = backward_planning.execute_plan(request, services, plan, external_url)
+    responses = backward_planning.execute_plan(request, services, graph, plan, external_url)
     metrics[req_id]['response_time'] = int(round(time.time() * 1000))
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
@@ -136,9 +136,9 @@ def main(parameters_file):
 
     # deploying AWS resources
     print('1. Deploying resources...')
-    #external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
-    #print('Load Balancer URL: ' + external_url)
-    #print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
+    print('Load Balancer URL: ' + external_url)
+    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
     external_url = ''
 
     print('2. Creating experiment datasets...')
@@ -146,11 +146,11 @@ def main(parameters_file):
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
     services_async = generator.get_services('async', experiment, created_services, 1)
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-    #rabbit_doa_consumer()
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+    rabbit_doa_consumer()
     print('- Deploying synchronous services')
     services_sync = generator.get_services('sync', experiment, created_services, len(services_async) + 1)
-    #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
     data_access.remove_services()
 
     # Running experiments
@@ -172,28 +172,28 @@ def main(parameters_file):
                     request_file = requests[i]
                     if approach == 'doa':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
-                        #doa_composition(request, services_number, length)
+                        doa_composition(request, services_number, length)
                     if approach == 'planning':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         planning_composition(external_url, request, services_number, length)
-                        time.sleep(2)
                     if approach == 'conversation':
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
-                        #conversation_composition(external_url, request, services_number, length)
+                        conversation_composition(external_url, request, services_number, length)
                     i = i + 1
+                    time.sleep(2)
         data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
-    #deploy_to_aws.remove_services(services_sync)
-    #deploy_to_aws.remove_services(services_async)
+    deploy_to_aws.remove_services(services_sync)
+    deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
-    #time.sleep(600)
+    time.sleep(600)
     # removing AWS resources
     print('9. Removing resources...')
-    #deploy_to_aws.remove_resources()
+    deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
 
 
