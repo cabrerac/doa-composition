@@ -69,18 +69,23 @@ def deploy_services(service_template_path, services):
                                 aws_secret_access_key=secret_access_key, region_name=aws_region)
     # for each service push image and create stack
     for service in services:
-        service_path, stack_name = _create_service_template(service_template_path, service)
-        if not _stack_exists(cloud_client, stack_name):
+        print('Deploying service: ' + service['name'] + '...')
+        stack_name = service['name'].replace('_','-') + '-stack'
+        exists, stack_id = _stack_exists(cloud_client, stack_name)
+        if not exists:
             print('Creating stack for service ' + service['name'] + '...')
             shutil.copyfile('./dockers/' + service['name'].replace('_', '-'), './Dockerfile')
             # pushing image for service
             service = _push_docker_image('.', service, aws_credentials)
             # reading service template
+            service_path, stack_name = _create_service_template(service_template_path, service)
             service_template = _parse_template(cloud_client, service_path)
             # creating service stack
             res = _create_stack(cloud_client, service_template, stack_name)
             print('Stack created for service ' + service['name'] + '...')
             os.remove(service_path)
+        else:
+            print('Stack already exists...')
 
 
 # removes services from AWS
@@ -258,9 +263,10 @@ def _push_docker_image(path, service, aws_credentials):
 
     # push image to AWS ECR
     push_log = docker_client.images.push(ecr_repo_name, tag=service_name)
-    # print(push_log)
+    #print(push_log)
     print('Image pushed to AWS ECR: ' + service_name + '...')
     service['imageUrl'] = BASE_ECR_URL + ECR_NAME + ':' + service_name
+    print(service['imageUrl'])
     return service
 
 
