@@ -143,21 +143,26 @@ def main(parameters_file):
     print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
     print('3. Deploying services in AWS...')
-    print('- Deploying asynchronous services')
-    services_async = generator.get_services('async', experiment, created_services)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
-    rabbit_doa_consumer()
-    print('- Deploying synchronous services')
-    services_sync = generator.get_services('sync', experiment, created_services)
-    deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
-    data_access.remove_services()
+    services_async= []
+    services_sync = []
+    if 'doa' in approaches:
+        print('- Deploying asynchronous services')
+        services_async = generator.get_services('async', experiment, created_services)
+        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+        rabbit_doa_consumer()
+    if 'conversation' in approaches or 'planning' in approaches:
+        print('- Deploying synchronous services')
+        services_sync = generator.get_services('sync', experiment, created_services)
+        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+        data_access.remove_services()
 
     # Running experiments
     print('4. Running experiments...')
     for services_number in services:
-        print('- Registering services: ' + str(services_number))
-        registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
-        data_access.insert_services(registry_services)
+        if 'conversation' in approaches or 'planning' in approaches:
+            print('- Registering services: ' + str(services_number))
+            registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
+            data_access.insert_services(registry_services)
         print('- Defining requests for experiment with ' + str(services_number) + ' services...')
         all_requests = {}
         for length in lengths:
@@ -180,11 +185,14 @@ def main(parameters_file):
                         conversation_composition(external_url, request, services_number, length)
                     i = i + 1
                     time.sleep(2)
-        data_access.remove_services()
+        if 'conversation' in approaches or 'planning' in approaches:
+            data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
-    deploy_to_aws.remove_services(services_sync)
-    deploy_to_aws.remove_services(services_async)
+    if 'doa' in approaches:
+        deploy_to_aws.remove_services(services_sync)
+    if 'conversation' in approaches or 'planning' in approaches:
+        deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
