@@ -8,6 +8,7 @@ from clients import client
 
 # creates plan for the request
 def create_plan(request):
+    print('creating plan...')
     outputs = request['outputs']
     inputs = []
     for inp in request['inputs']:

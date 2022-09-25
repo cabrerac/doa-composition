@@ -1,8 +1,0 @@
-id,name,approach,services,length,planning_time,execution_time,total_time,messages_size,input_size
-planning_1,request_19,planning,100,5,64,0,64,0,400
-planning_2,request_5,planning,100,5,56,0,56,0,399
-planning_3,request_12,planning,100,5,53,1,54,0,401
-planning_4,request_17,planning,100,5,55,0,55,0,401
-planning_5,request_0,planning,100,5,57,0,57,0,398
-planning_6,request_4,planning,100,5,55,0,55,0,399
-planning_7,request_16,planning,100,5,61,1,62,0,400
