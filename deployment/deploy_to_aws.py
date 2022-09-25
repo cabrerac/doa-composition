@@ -69,17 +69,18 @@ def deploy_services(service_template_path, services):
                                 aws_secret_access_key=secret_access_key, region_name=aws_region)
     # for each service push image and create stack
     for service in services:
-        print('Creating stack for service ' + service['name'] + '...')
-        shutil.copyfile('./dockers/' + service['name'].replace('_', '-'), './Dockerfile')
-        # pushing image for service
-        service = _push_docker_image('.', service, aws_credentials)
-        # reading service template
         service_path, stack_name = _create_service_template(service_template_path, service)
-        service_template = _parse_template(cloud_client, service_path)
-        # creating service stack
-        res = _create_stack(cloud_client, service_template, stack_name)
-        print('Stack created for service ' + service['name'] + '...')
-        os.remove(service_path)
+        if not _stack_exists(cloud_client, stack_name):
+            print('Creating stack for service ' + service['name'] + '...')
+            shutil.copyfile('./dockers/' + service['name'].replace('_', '-'), './Dockerfile')
+            # pushing image for service
+            service = _push_docker_image('.', service, aws_credentials)
+            # reading service template
+            service_template = _parse_template(cloud_client, service_path)
+            # creating service stack
+            res = _create_stack(cloud_client, service_template, stack_name)
+            print('Stack created for service ' + service['name'] + '...')
+            os.remove(service_path)
 
 
 # removes services from AWS
@@ -205,7 +206,7 @@ def _remove_stack(cloud_client, stack_name):
 
 # validate if stack exists in AWS
 def _stack_exists(cloud_client, stack_name):
-    stacks = cloud_client.list_stacks()['StackSummaries']
+    stacks = cloud_client.list_stacks(StackStatusFilter=['CREATE_COMPLETE'])['StackSummaries']
     for stack in stacks:
         if stack['StackStatus'] == 'DELETE_COMPLETE':
             continue

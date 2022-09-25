@@ -70,7 +70,7 @@ def doa_composition(request, n, le):
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     producer.publish(topic, message_dict)
     metrics[req_id] = measurement
-    
+
 
 # conversation based composition approach
 def conversation_composition(external_url, request, n, le):

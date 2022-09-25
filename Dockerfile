@@ -7,6 +7,9 @@ EXPOSE 5000/tcp
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the rabbitMQ credentials to the working directory
+COPY rabbit-mq.yaml .
+
 # Copy the dependencies file to the working directory
 COPY requirements-microservices.txt .
 
@@ -14,7 +17,7 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/service_34_sync.py .
+COPY microservices/service_1_async.py .
 
 # Create logic directory
 RUN mkdir ./logic
@@ -22,11 +25,18 @@ RUN mkdir ./logic
 # Copy the util code to the working directory
 COPY microservices/logic/util.py ./logic/
 
+# Create clients directory
+RUN mkdir ./clients
+
+# Copy the rabbitmq consumer and producer
+COPY clients/consumer.py ./clients/
+COPY clients/producer.py ./clients/
+
 # Create description directory
 RUN mkdir ./description
 
 # Copy the service description
-COPY datasets/descriptions/100-100000-services/services/service_34.json ./description/
+COPY datasets/descriptions/100-100000-services/services/service_1.json ./description/
 
 # Specify the command to run on container start
-CMD ["python", "./service_34_sync.py"]
+CMD ["python", "-u", "./service_1_async.py"]
