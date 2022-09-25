@@ -142,7 +142,6 @@ def main(parameters_file):
 
     print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
-    print(created_services)
     print('3. Deploying services in AWS...')
     print('- Deploying asynchronous services')
     services_async = generator.get_services('async', experiment, created_services)
@@ -190,7 +189,7 @@ def main(parameters_file):
     print('8. Plotting results...')
     plotting.plot_results(parameters)
     print('Waiting before removing resources...')
-    time.sleep(600)
+    time.sleep(900)
     # removing AWS resources
     print('9. Removing resources...')
     deploy_to_aws.remove_resources()

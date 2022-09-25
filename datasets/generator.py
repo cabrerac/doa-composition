@@ -23,7 +23,6 @@ def create_dataset(path, experiment, deployable_services, requests_number, lengt
         created_services = []
         print('- Dataset already exists...')
         files = os.listdir(path + experiment + '/services/')
-        print(files)
         for file in files:
             created_services.append(file.split('.')[0].split('_')[1])
         return created_services
@@ -35,8 +34,8 @@ def create_services_descriptions(experiment, dag):
     Path('./datasets/descriptions/' + experiment + '/services').mkdir(parents=True, exist_ok=True)
     Path('./datasets/descriptions/' + experiment + '/requests').mkdir(parents=True, exist_ok=True)
     services = 0
-    priority_async = 0
-    priority_sync = 1
+    priority_async = 1
+    priority_sync = 2
     for node in dag.nodes:
         file = open('./datasets/templates/service_template.json')
         service_template = json.load(file)
@@ -232,9 +231,9 @@ def get_services(service_type, experiment, created_services):
         service['cpu'] = 256
         service['memory'] = 512
         service['path'] = '/doa_composition/' + service['name']
-        if service_type == 'async'
+        if service_type == 'async':
             service['priority'] = service['priority_async']
-        if service_type == 'sync'
+        if service_type == 'sync':
             service['priority'] = service['priority_sync']
         service['count'] = 1
         services.append(service)
@@ -253,9 +252,9 @@ def get_services_to_register(service_type, experiment, services_number, created_
         service['cpu'] = 256
         service['memory'] = 512
         service['path'] = '/doa_composition/' + service['name']
-        if service_type == 'async'
+        if service_type == 'async':
             service['priority'] = service['priority_async']
-        if service_type == 'sync'
+        if service_type == 'sync':
             service['priority'] = service['priority_sync']
         service['count'] = 1
         services.append(service)

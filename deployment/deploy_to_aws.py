@@ -180,6 +180,7 @@ def _create_stack(cloud_client, template_body, stack_name):
         waiter.wait(StackName=stack_name)
     except botocore.exceptions.ClientError as ex:
         error_message = ex.response['Error']['Message']
+        print('error: ' + error_message)
         if error_message == 'No updates are to be performed.':
             print('No changes...')
         else:
