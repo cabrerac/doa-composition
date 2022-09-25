@@ -62,7 +62,7 @@ def doa_composition(request, n, le):
     topic = 'service.' + request['inputs'][0]['name']
     expected_output = request['outputs'][0]['name']
     message_dict = {'req_id': req_id, 'expected_output': expected_output, 'user_topic': 'user.response',
-                    'desc': 'request from main!!!'}
+                    'desc': 'request from main!!!', 'parameters': request['inputs']}
     message_dict['messages_size'] = sys.getsizeof(str(message_dict))
     producer = Producer(credentials)
     measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,

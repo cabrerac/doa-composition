@@ -20,8 +20,8 @@ def callback(ch, method, properties, body):
     inputs = []
     if req_id in requests:
         inputs = requests[req_id]
-    for output in message['outputs']:
-        inputs.append(output)
+    for input in message['parameters']:
+        inputs.append(input)
     if _compare(inputs, description['inputs']):
         user_topic = message['user_topic']
         expected_output = message['expected_output']
@@ -33,7 +33,7 @@ def callback(ch, method, properties, body):
             output['value'] = 'Output value from ' + description['name']
         message_dict = {
             'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
-            'outputs': outputs
+            'parameters': outputs
         }
         messages_size = messages_size + sys.getsizeof(str(message_dict))
         message_dict['messages_size'] = messages_size
