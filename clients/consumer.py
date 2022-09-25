@@ -22,7 +22,7 @@ class Consumer(threading.Thread):
         queue_name = result.method.queue
         self.channel.queue_bind(exchange='messages', queue=queue_name, routing_key=binding_key)
         self.channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
-        threading.Thread(target=self.channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True))
+        threading.Thread(target=self.channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True), daemon=True)
     
     def run(self):
         print(' [*] Waiting for messages...')

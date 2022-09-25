@@ -14,10 +14,10 @@ def create_dataset(path, experiment, deployable_services, requests_number, lengt
         dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
         print('- Creating services and requests for experiment ' + experiment + '...')
         create_services_descriptions(experiment, dag)
-        print('- Creating services implementations for experiment ' + experiment + '...')
-        create_services_implementations(experiment, dag)
         print('- Creating services requests for experiment ' + experiment + '...')
         create_services_requests(requests_number, lengths, dag, experiment, path, deployable_services)
+        print('- Creating services implementations for experiment ' + experiment + '...')
+        create_services_implementations(experiment, dag)
         return list(dag.nodes)
     else:
         created_services = []
@@ -144,6 +144,8 @@ def create_services_requests(r, lengths, dag, experiment, path, deployable_servi
         else:
             print('Not enought requests in graph...')
             print('Recreating dataset...')
+            if os.path.exists(path + experiment + '/'):
+                shutil.rmtree(path + experiment + '/')
             create_dataset(path, experiment, deployable_services, r, lengths)
             break
 
