@@ -5,7 +5,6 @@ import sys
 import pandas as pd
 
 from deployment import deploy_to_aws
-from clients import client
 from registry import data_access
 import microservices.logic.util as util
 from clients.producer import Producer
@@ -47,13 +46,22 @@ def rabbit_doa_consumer():
 def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
-    print('Response DOA request: ' + req_id)
-    metrics[req_id]['response_time'] = int(round(time.time() * 1000))
-    metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
-    metrics[req_id]['execution_time'] = metrics[req_id]['total_time']
-    metrics[req_id]['messages_size'] = message['messages_size']
-    results.append(metrics[req_id])
-    save(results_file, results, 'utf-8')
+    responses = []
+    if req_id in request_responses:
+        responses = request_responses[req_id]
+    parameters = message['parameters']
+    for parameter in parameters:
+        if parameter not in responses:
+            responses.append(parameter)
+    request_responses[req_id] = responses
+    if util.compare(request_responses[req_id], request_outputs[req_id]):
+        print('Response DOA request: ' + req_id)
+        metrics[req_id]['response_time'] = int(round(time.time() * 1000))
+        metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
+        metrics[req_id]['execution_time'] = metrics[req_id]['total_time']
+        metrics[req_id]['messages_size'] = message['messages_size']
+        results.append(metrics[req_id])
+        save(results_file, results, 'utf-8')
 
 
 # doa based composition approach

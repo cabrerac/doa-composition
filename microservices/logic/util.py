@@ -35,11 +35,12 @@ def read_service_description(file):
 # compares two lists of parameters
 def compare(pars_1, pars_2):
     if len(pars_1) == len(pars_2):
-        index = 0
-        while index < len(pars_1):
-            if pars_1[index]['name'] != pars_2[index]['name']:
+        names_pars = []
+        for par in pars_2:
+            names_pars.append(par['name'])
+        for par in pars_1:
+            if par['name'] not in pars_2:
                 return False
-            index = index + 1
     else:
         return False
     return True

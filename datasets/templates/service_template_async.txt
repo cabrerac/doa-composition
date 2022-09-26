@@ -32,7 +32,7 @@ def callback(ch, method, properties, body):
         for output in outputs:
             output['value'] = 'Output value from ' + description['name']
         message_dict = {
-            'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
+            'req_id': req_id, 'user_topic': user_topic, 'expected_outputs': expected_outputs, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
             'parameters': outputs
         }
         messages_size = messages_size + sys.getsizeof(str(message_dict))
