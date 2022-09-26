@@ -3,12 +3,14 @@ import pika
 import json
 
 
+# reads credentials
 def read_rabbit_credentials(file):
     with open(file, 'r') as stream:
         credentials = load_yaml(stream)
         return credentials
 
 
+# publishes message on rabbitMQ
 def publish_message(host, msg, queue):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
     channel = connection.channel()
@@ -23,7 +25,30 @@ def publish_message(host, msg, queue):
     connection.close()
 
 
+# reads service description
 def read_service_description(file):
     f = open(file)
     description = json.load(f)
     return description
+
+
+# compares two lists of parameters
+def compare(pars_1, pars_2):
+    if len(pars_1) == len(pars_2):
+        index = 0
+        while index < len(pars_1):
+            if pars_1[index]['name'] != pars_2[index]['name']:
+                return False
+            index = index + 1
+    else:
+        return False
+    return True
+
+
+# compares if service outputs are in the expected outputs list
+def compare_outputs(expected_outputs, service_outputs):
+    for service_output in service_outputs:
+        for expected_output in expected_outputs:
+            if service_output['name'] == expected_output['name']:
+                return True
+    return False

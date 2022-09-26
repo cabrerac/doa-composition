@@ -22,6 +22,8 @@ results = []
 rabbit_credentials_file = 'rabbit-mq.yaml'
 dataset_path = './datasets/descriptions/'
 results_file = ''
+request_outputs = {}
+request_responses = {}
 
 
 # writes results file
@@ -60,8 +62,7 @@ def doa_composition(request, n, le):
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request DOA: ' + req_id + ' ::: ' + request['name'] )
     topic = 'service.' + request['inputs'][0]['name']
-    expected_output = request['outputs'][0]['name']
-    message_dict = {'req_id': req_id, 'expected_output': expected_output, 'user_topic': 'user.response',
+    message_dict = {'req_id': req_id, 'expected_outputs': request['outputs'], 'user_topic': 'user.response',
                     'desc': 'request from main!!!', 'parameters': request['inputs']}
     message_dict['messages_size'] = sys.getsizeof(str(message_dict))
     producer = Producer(credentials)
@@ -70,6 +71,7 @@ def doa_composition(request, n, le):
                    'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
     producer.publish(topic, message_dict)
     metrics[req_id] = measurement
+    request_outputs[req_id]['outputs'] = request['outputs']
 
 
 # conversation based composition approach
