@@ -98,9 +98,9 @@ def conversation_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(str(response.request.method)) + sys.getsizeof(str(response.request.url)) \
-                       + sys.getsizeof(str(response.request.headers)) + sys.getsizeof(str(response.request.body))
+        request_size = sys.getsizeof(str(response.request.body))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
+        print(str(response.request.body))
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
 
@@ -121,8 +121,8 @@ def planning_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(str(response.request.method)) + sys.getsizeof(str(response.request.url)) \
-                       + sys.getsizeof(str(response.request.headers)) + sys.getsizeof(str(response.request.body))
+        request_size = sys.getsizeof(str(response.request.body))
+        print(str(response.request.body))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')

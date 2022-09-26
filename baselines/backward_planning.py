@@ -43,7 +43,6 @@ def _backward_planning(plans):
             for key, ser in plan['services'].items():
                 if key not in temp_plan['services']:
                     temp_plan['services'][key] = ser
-            inputs = plan['inputs']
             outputs = plan['outputs']
             for output in outputs:
                 query = {'outputs.name': output['name']}
@@ -78,7 +77,7 @@ def _backward_planning(plans):
                     if _compare(temp_plan['inputs'], temp_plan['outputs']):
                         temp_plan['finished'] = True
                     else:
-                        temp_plan['finished'] = False 
+                        temp_plan['finished'] = False
             temp_plans.append(temp_plan)
         plans = _backward_planning(temp_plans)
         return plans
@@ -87,7 +86,7 @@ def _backward_planning(plans):
 # validates when the backward algorithm should finish
 def _finished(plans):
     for plan in plans:
-        if plan['finished'] == True:
+        if plan['finished']:
             return True
     return False
 
@@ -95,11 +94,11 @@ def _finished(plans):
 # compares two lists of parameters
 def _compare(pars_1, pars_2):
     if len(pars_1) == len(pars_2):
-       index = 0
-       while index < len(pars_1):
-           if pars_1[index]['name'] != pars_2[index]['name']:
-               return False
-           index = index + 1
+        index = 0
+        while index < len(pars_1):
+            if pars_1[index]['name'] != pars_2[index]['name']:
+                return False
+            index = index + 1
     else:
         return False
     return True
@@ -120,9 +119,9 @@ def execute_plan(request, services, graph, plan, external_url):
             for predecessor in predecessors:
                 if predecessor not in executed:
                     if (index + 1) in plan:
-                        plan[index+1].append(value)
+                        plan[index + 1].append(value)
                     else:
-                        plan[index+1] = [value]
+                        plan[index + 1] = [value]
                     ready = False
                     break
             if ready:
