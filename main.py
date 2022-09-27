@@ -46,6 +46,8 @@ def rabbit_doa_consumer():
 def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
+    description = message['desc']
+    print('Response DOA request: ' + req_id + ' ::: ' + desc)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
@@ -98,9 +100,8 @@ def conversation_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(str(response.request.body))
+        request_size = sys.getsizeof(str(response.request.body)) + sys.getsizeof(str(response.text))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
-        print(str(response.request.body))
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')
 
@@ -121,8 +122,7 @@ def planning_composition(external_url, request, n, le):
     metrics[req_id]['execution_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
     metrics[req_id]['total_time'] = metrics[req_id]['planning_time'] + metrics[req_id]['execution_time']
     for response in responses:
-        request_size = sys.getsizeof(str(response.request.body))
-        print(str(response.request.body))
+        request_size = sys.getsizeof(str(response.request.body)) + sys.getsizeof(str(response.text))
         metrics[req_id]['messages_size'] = metrics[req_id]['messages_size'] + request_size
     results.append(metrics[req_id])
     save(results_file, results, 'utf-8')

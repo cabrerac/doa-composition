@@ -138,6 +138,7 @@ def execute_plan(request, services, graph, plan, external_url):
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
                 response = client.make_request(external_url, service['path'], parameters)
+                print(response.text)
                 responses.append(response)
                 outputs[value] = response.json()['outputs']
                 executed.append(value)
