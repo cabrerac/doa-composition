@@ -22,7 +22,7 @@ def <service>_sync():
         for output in outputs:
             output['value'] = 'Output value from ' + description['name']
         return make_response({'res': 'Response from ' + description['name'] + '_sync', 'outputs': outputs})
-    except ex:
+    except Exception as ex:
         return make_response({'res': 'Service exception ' + ex + '!!!', 'outputs': []})
 
 
