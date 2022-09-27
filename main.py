@@ -212,6 +212,7 @@ def main(parameters_file):
     print('9. Removing resources...')
     deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
+    sys.exit()
 
 
 if __name__ == "__main__":

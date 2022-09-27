@@ -1,0 +1,22 @@
+{
+  "outputs": [
+    {
+      "name": "_OUTPUT_SERVICE_5",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "_OUTPUT_SERVICE_3",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    },
+    {
+      "name": "_OUTPUT_SERVICE_4",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "name": "service_5",
+  "description": "This is the service 5",
+  "priority_async": 47,
+  "priority_sync": 48
+}

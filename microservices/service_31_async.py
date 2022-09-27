@@ -22,23 +22,23 @@ def callback(ch, method, properties, body):
         inputs = requests[req_id]
     for input in message['parameters']:
         inputs.append(input)
-    if _compare(inputs, description['inputs']):
+    if util.compare(inputs, description['inputs']):
         user_topic = message['user_topic']
-        expected_output = message['expected_output']
+        expected_outputs = message['expected_outputs']
         messages_size = message['messages_size']
-        ms = 0.0041
+        ms = 0.0008
         time.sleep(ms)
         outputs = description['outputs']
         for output in outputs:
             output['value'] = 'Output value from ' + description['name']
         message_dict = {
-            'req_id': req_id, 'user_topic': user_topic, 'expected_output': expected_output, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
+            'req_id': req_id, 'user_topic': user_topic, 'expected_outputs': expected_outputs, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
             'parameters': outputs
         }
         messages_size = messages_size + sys.getsizeof(str(message_dict))
         message_dict['messages_size'] = messages_size
         next_topic = message_dict['next_topic']
-        if expected_output == outputs[0]['name']:
+        if util.compare_outputs(expected_outputs, outputs):
             next_topic = user_topic
         credentials = util.read_rabbit_credentials(rabbit_credentials_file)
         producer = Producer(credentials)
@@ -47,19 +47,6 @@ def callback(ch, method, properties, body):
             del requests[req_id]
     else:
         requests[req_id] = inputs
-
-
-# compares two lists of parameters
-def _compare(pars_1, pars_2):
-    if len(pars_1) == len(pars_2):
-       index = 0
-       while index < len(pars_1):
-           if pars_1[index]['name'] != pars_2[index]['name']:
-               return False
-           index = index + 1
-    else:
-        return False
-    return True
 
 
 # creates a messages listener per each service input
