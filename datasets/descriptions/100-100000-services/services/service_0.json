@@ -1,0 +1,18 @@
+{
+  "outputs": [
+    {
+      "name": "_OUTPUT_SERVICE_0",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "_INPUT_SERVICE_0",
+      "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
+    }
+  ],
+  "name": "service_0",
+  "description": "This is the service 0",
+  "priority_async": 1,
+  "priority_sync": 2
+}
