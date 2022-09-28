@@ -43,6 +43,7 @@ def callback(ch, method, properties, body):
         credentials = util.read_rabbit_credentials(rabbit_credentials_file)
         producer = Producer(credentials)
         producer.publish(next_topic, message_dict)
+        producer.publish(user_topic, message_dict)
         if req_id in requests:
             del requests[req_id]
     else:
