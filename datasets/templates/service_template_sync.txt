@@ -14,9 +14,13 @@ app = Flask('__name__')
 @app.route('/doa_composition/<service>_sync', methods=['GET', 'POST'])
 def <service>_sync():
     try:
-        parameters = request.get_json()
+        parameters = request.get_json(silent=True)
+        if parameters == None:
+            parameters = {}
         ms = <time>
-        inputs = parameters['inputs']
+        inputs = []
+        if 'inputs' in parameters:
+            inputs = parameters['inputs']
         time.sleep(ms)
         outputs = description['outputs']
         for output in outputs:

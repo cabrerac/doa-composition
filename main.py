@@ -47,17 +47,20 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
     description = message['desc']
-    print('Response DOA request: ' + req_id + ' ::: ' + description)
+    next_topic = message['next_topic']
+    print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: ' + next_topic)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
-    parameters = message['parameters']
+    parameters = []
+    if parameters in message[]:
+        parameters = message['parameters']
     for parameter in parameters:
         if parameter not in responses:
             responses.append(parameter)
     request_responses[req_id] = responses
-    if util.compare(request_responses[req_id], request_outputs[req_id]):
-        print('Response DOA request: ' + req_id)
+    if util.compare(request_outputs[req_id]['outputs'], request_responses[req_id]):
+        print('Response DOA request complete: ' + req_id)
         metrics[req_id]['response_time'] = int(round(time.time() * 1000))
         metrics[req_id]['total_time'] = metrics[req_id]['response_time'] - metrics[req_id]['request_time']
         metrics[req_id]['execution_time'] = metrics[req_id]['total_time']
@@ -185,6 +188,7 @@ def main(parameters_file):
                 while i < experiment_requests:
                     request_file = requests[i]
                     if approach == 'doa':
+                        input('Press any key...')
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
@@ -194,7 +198,7 @@ def main(parameters_file):
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     i = i + 1
-                    time.sleep(2)
+                    time.sleep(5)
         if 'conversation' in approaches or 'planning' in approaches:
             data_access.remove_services()
     # removing services from AWS
