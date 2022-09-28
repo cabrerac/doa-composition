@@ -39,7 +39,7 @@ def compare(pars_1, pars_2):
         for par in pars_2:
             names_pars.append(par['name'])
         for par in pars_1:
-            if par['name'] not in pars_2:
+            if par['name'] not in names_pars:
                 return False
     else:
         return False

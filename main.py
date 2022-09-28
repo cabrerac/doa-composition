@@ -47,7 +47,7 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
     description = message['desc']
-    print('Response DOA request: ' + req_id + ' ::: ' + desc)
+    print('Response DOA request: ' + req_id + ' ::: ' + description)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
@@ -153,7 +153,7 @@ def main(parameters_file):
     print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
     print('3. Deploying services in AWS...')
-    services_async= []
+    services_async = []
     services_sync = []
     if 'doa' in approaches:
         print('- Deploying asynchronous services')
