@@ -31,7 +31,8 @@ def _plot_all_metrics(parameters):
     for services_number in services:
         filtered_results = results.loc[results['services'] == services_number]
         if len(results) > 0:
-            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index][0])
+            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index][0], color = 'darkblue')
+            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index][0], color = 'lightblue', errorbar=None)
             axs[index][0].set(title=('Average Response Time'))
             axs[index][0].set(xlabel=('Approach'))
             axs[index][0].set(ylabel=('Milliseconds (ms)'))
@@ -71,7 +72,8 @@ def _plot_services(parameters):
         filtered_results = results.loc[results['services'] == services_number]
         fig, axs = plt.subplots(1, 3, figsize=(25, 10), sharex=False)
         if len(results) > 0:
-            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[0])
+            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[0], color='darkblue')
+            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[0], color='lightblue', errorbar=None)
             axs[0].set(title=('Average Response Time'))
             axs[0].set(xlabel=('Approach'))
             axs[0].set(ylabel=('Milliseconds (ms)'))
@@ -105,50 +107,73 @@ def _plot_metrics(parameters):
     experiment = parameters['experiment']
     results_file = parameters['results_file']
     services = parameters['services']
+    lengths = parameters['lengths']
     results = pd.read_csv(results_file)
-    metrics = ['response_time', 'messages_size', 'input_size']
+    metrics = ['response-time']
     for metric in metrics:
-        fig, axs = plt.subplots(2, 2, figsize=(25, 25), sharex=False, sharey=True)
         index1 = 0
         index2 = 0
+        fig, axs = plt.subplots(2, 2, figsize=(25, 25), sharex=False, sharey=False)
         for services_number in services:
             if services_number == 1000:
-                index1 = 1
-                index2 = 0
-            if services_number == 10000:
                 index1 = 0
                 index2 = 1
+            if services_number == 10000:
+                index1 = 1
+                index2 = 0
             if services_number == 100000:
                 index1 = 1
                 index2 = 1
             filtered_results = results.loc[results['services'] == services_number]
-            if metric == 'response_time':
-                sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2])
-                axs[index1][index2].set(title=('Average End to End Response Time (ms)'))
+            if metric == 'response-time':
+                sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2], color='darkblue')
+                g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index1][index2], color='lightblue', errorbar=None)
+                axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
+                g.set_xticklabels(['Conversation', 'Planning'])
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
-            if metric == 'messages_size':
+        fig.savefig('./results/figs/' + experiment + '/' + metric + '-services-results.pdf')
+
+    metrics = ['messages-size', 'input-size']
+    for metric in metrics:
+        index1 = 0
+        index2 = 0
+        fig, axs = plt.subplots(2, 2, figsize=(25, 25), sharex=False, sharey=False)
+        for length in lengths:
+            if length == 10:
+                index1 = 0
+                index2 = 1
+            if length == 15:
+                index1 = 1
+                index2 = 0
+            if length == 20:
+                index1 = 1
+                index2 = 1
+            if metric == 'messages-size':
+                filtered_results = results.loc[results['services'] == 100000]
+                filtered_results = filtered_results.loc[filtered_results['length'] == length]
                 filtered_results['messages_size'] = filtered_results['messages_size']/1024
-                sns.barplot(x='approach', y='messages_size', hue='length', data=filtered_results, ax=axs[index1][index2])
-                axs[index1][index2].set(title=('Average Messages Size (KBs)'))
+                g = sns.boxplot(x="approach", y='messages_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
+                axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
+                g.set_xticklabels(['Conversation', 'Planning'])
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
-                handles, labels = axs[index1][index2].get_legend_handles_labels()
-                axs[index1][index2].legend(handles, labels, title='Graph Size')
-            if metric == 'input_size':
+                axs[index1][index2].legend([], [], frameon=False)
+            if metric == 'input-size':
+                filtered_results = results.loc[results['services'] == 100000]
+                filtered_results = filtered_results.loc[filtered_results['length'] == length]
                 filtered_results['input_size'] = filtered_results['input_size'] / 1024
-                sns.barplot(x='approach', y='input_size', hue='length', data=filtered_results, ax=axs[index1][index2])
-                axs[index1][index2].set(title=('Average Input Size (KBs)'))
+                g = sns.boxplot(x='approach', y='input_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
+                axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
+                g.set_xticklabels(['Conversation', 'Planning'])
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
-                handles, labels = axs[index1][index2].get_legend_handles_labels()
-                axs[index1][index2].legend(handles, labels, title='Graph Size')
-        fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+                axs[index1][index2].legend([], [], frameon=False)
         fig.savefig('./results/figs/' + experiment + '/' + metric + '-services-results.pdf')
 
 
@@ -156,6 +181,6 @@ def _plot_metrics(parameters):
 def plot_results(parameters):
     experiment = parameters['experiment']
     Path('./results/figs/' + experiment).mkdir(parents=True, exist_ok=True)
-    _plot_all_metrics(parameters)
-    _plot_services(parameters)
+    #_plot_all_metrics(parameters)
+    #_plot_services(parameters)
     _plot_metrics(parameters)
