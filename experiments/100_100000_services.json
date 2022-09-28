@@ -1,6 +1,6 @@
 {
   "experiment": "100-100000-services",
-  "approaches": ["doa", "conversation", "planning"],
+  "approaches": ["doa"],
   "lengths": [5, 10, 15, 20],
   "services": [100, 1000, 10000, 100000],
   "requests_number": 20,

@@ -161,7 +161,7 @@ def main(parameters_file):
     if 'doa' in approaches:
         print('- Deploying asynchronous services')
         services_async = generator.get_services('async', experiment, created_services)
-        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+        #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
         rabbit_doa_consumer()
     if 'conversation' in approaches or 'planning' in approaches:
         print('- Deploying synchronous services')
@@ -203,12 +203,12 @@ def main(parameters_file):
     # removing services from AWS
     print('7. Removing services...')
     if 'doa' in approaches:
-        deploy_to_aws.remove_services(services_sync)
-    if 'conversation' in approaches or 'planning' in approaches:
         deploy_to_aws.remove_services(services_async)
+    if 'conversation' in approaches or 'planning' in approaches:
+        deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    plotting.plot_results(parameters)
+    #plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources
