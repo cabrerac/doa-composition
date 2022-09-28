@@ -186,9 +186,9 @@ def main(parameters_file):
                 requests = all_requests[length]
                 i = 0
                 while i < experiment_requests:
+                    input('Press any key...')
                     request_file = requests[i]
                     if approach == 'doa':
-                        input('Press any key...')
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
