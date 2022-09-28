@@ -171,7 +171,7 @@ def main(parameters_file):
 
     # Running experiments
     print('4. Running experiments...')
-    for services_number in services:
+    """for services_number in services:
         if 'conversation' in approaches or 'planning' in approaches:
             print('- Registering services: ' + str(services_number))
             registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
@@ -186,7 +186,6 @@ def main(parameters_file):
                 requests = all_requests[length]
                 i = 0
                 while i < experiment_requests:
-                    input('Press any key...')
                     request_file = requests[i]
                     if approach == 'doa':
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
@@ -198,15 +197,15 @@ def main(parameters_file):
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     i = i + 1
-                    time.sleep(5)
+                    time.sleep(2)
         if 'conversation' in approaches or 'planning' in approaches:
-            data_access.remove_services()
+            data_access.remove_services()"""
     # removing services from AWS
     print('7. Removing services...')
-    #if 'doa' in approaches:
-    #    deploy_to_aws.remove_services(services_sync)
-    #if 'conversation' in approaches or 'planning' in approaches:
-    #    deploy_to_aws.remove_services(services_async)
+    if 'doa' in approaches:
+        deploy_to_aws.remove_services(services_sync)
+    if 'conversation' in approaches or 'planning' in approaches:
+        deploy_to_aws.remove_services(services_async)
     # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
