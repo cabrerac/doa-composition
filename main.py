@@ -53,7 +53,7 @@ def callback(ch, method, properties, body):
     if req_id in request_responses:
         responses = request_responses[req_id]
     parameters = []
-    if parameters in message[]:
+    if parameters in message:
         parameters = message['parameters']
     for parameter in parameters:
         if parameter not in responses:
