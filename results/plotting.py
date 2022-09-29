@@ -18,7 +18,7 @@ plt.rc('xtick', labelsize=28)
 plt.rc('ytick', labelsize=SMALL_SIZE)
 plt.rc('legend', fontsize=SMALL_SIZE)
 plt.rc('figure', titlesize=LARGE_SIZE)
-
+sns.set_palette("Paired")
 
 # plots all metrics in one graph
 def _plot_all_metrics(parameters):
@@ -31,8 +31,8 @@ def _plot_all_metrics(parameters):
     for services_number in services:
         filtered_results = results.loc[results['services'] == services_number]
         if len(results) > 0:
-            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index][0], color = 'darkblue')
-            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index][0], color = 'lightblue', errorbar=None)
+            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index][0])
+            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index][0], errorbar=None)
             axs[index][0].set(title=('Average Response Time'))
             axs[index][0].set(xlabel=('Approach'))
             axs[index][0].set(ylabel=('Milliseconds (ms)'))
@@ -72,8 +72,8 @@ def _plot_services(parameters):
         filtered_results = results.loc[results['services'] == services_number]
         fig, axs = plt.subplots(1, 3, figsize=(25, 10), sharex=False)
         if len(results) > 0:
-            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[0], color='darkblue')
-            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[0], color='lightblue', errorbar=None)
+            sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[0])
+            sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[0], errorbar=None)
             axs[0].set(title=('Average Response Time'))
             axs[0].set(xlabel=('Approach'))
             axs[0].set(ylabel=('Milliseconds (ms)'))
@@ -109,7 +109,7 @@ def _plot_metrics(parameters):
     services = parameters['services']
     lengths = parameters['lengths']
     results = pd.read_csv(results_file)
-    metrics = ['response-time']
+    metrics = ['response-time', 'execution-time', 'planning-time']
     for metric in metrics:
         index1 = 0
         index2 = 0
@@ -126,8 +126,25 @@ def _plot_metrics(parameters):
                 index2 = 1
             filtered_results = results.loc[results['services'] == services_number]
             if metric == 'response-time':
-                sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2], color='darkblue')
-                g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index1][index2], color='lightblue', errorbar=None)
+                g = sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2])
+                axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
+                g.set_xticklabels(['Conversation', 'Planning'])
+                axs[index1][index2].set(xlabel=('Approach'))
+                axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
+                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
+                handles, labels = axs[index1][index2].get_legend_handles_labels()
+                axs[index1][index2].legend(handles, labels, title='Graph Size')
+            if metric == 'execution-time':
+                g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index1][index2])
+                axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
+                g.set_xticklabels(['Conversation', 'Planning'])
+                axs[index1][index2].set(xlabel=('Approach'))
+                axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
+                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
+                handles, labels = axs[index1][index2].get_legend_handles_labels()
+                axs[index1][index2].legend(handles, labels, title='Graph Size')
+            if metric == 'planning-time':
+                g = sns.barplot(x='approach', y='planning_time', hue='length', data=filtered_results, ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(['Conversation', 'Planning'])
                 axs[index1][index2].set(xlabel=('Approach'))
@@ -181,6 +198,6 @@ def _plot_metrics(parameters):
 def plot_results(parameters):
     experiment = parameters['experiment']
     Path('./results/figs/' + experiment).mkdir(parents=True, exist_ok=True)
-    #_plot_all_metrics(parameters)
-    #_plot_services(parameters)
+    _plot_all_metrics(parameters)
+    _plot_services(parameters)
     _plot_metrics(parameters)
