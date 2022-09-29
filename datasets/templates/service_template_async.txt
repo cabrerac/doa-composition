@@ -32,27 +32,35 @@ def callback(ch, method, properties, body):
             outputs = description['outputs']
             for output in outputs:
                 output['value'] = 'Output value from ' + description['name']
-            message_dict = {
-                'req_id': req_id, 'user_topic': user_topic, 'expected_outputs': expected_outputs, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + outputs[0]['name'],
-                'parameters': outputs
-            }
-            messages_size = messages_size + sys.getsizeof(str(message_dict))
-            message_dict['messages_size'] = messages_size
-            next_topic = message_dict['next_topic']
-            if util.compare_outputs(expected_outputs, outputs):
-                next_topic = user_topic
-            credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-            producer = Producer(credentials)
-            producer.publish(next_topic, message_dict)
-            producer.publish(user_topic, message_dict)
-            if req_id in requests:
-                del requests[req_id]
+                message_dict = {
+                    'req_id': req_id, 'user_topic': user_topic, 'expected_outputs': expected_outputs, 'desc': 'message from ' + description['name'] + '_async', 'next_topic': 'service.' + output['name'],
+                    'parameters': outputs
+                }
+                messages_size = messages_size + sys.getsizeof(str(message_dict))
+                message_dict['messages_size'] = messages_size
+                next_topic = message_dict['next_topic']
+                if util.compare_outputs(expected_outputs, outputs):
+                    next_topic = user_topic
+                credentials = util.read_rabbit_credentials(rabbit_credentials_file)
+                producer = Producer(credentials)
+                producer.publish(next_topic, message_dict)
+                producer.publish(user_topic, message_dict)
+                if req_id in requests:
+                    del requests[req_id]
         else:
             requests[req_id] = inputs
+            user_topic = message['user_topic']
+            message_dict = {
+                    'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: else', 'next_topic': 'service.' + output['name'],
+                    'parameters': outputs
+            }
+            credentials = util.read_rabbit_credentials(rabbit_credentials_file)
+            producer = Producer(credentials)
+            producer.publish(user_topic, message_dict)
     except Exception as ex:
         user_topic = message['user_topic']
         message_dict = {
-                'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ' + ex, 'next_topic': user_topic,
+                'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ' + ex, 'next_topic': user_topic
         }
         credentials = util.read_rabbit_credentials(rabbit_credentials_file)
         producer = Producer(credentials)

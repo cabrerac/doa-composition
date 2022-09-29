@@ -1,4 +1,4 @@
-import time
+limport time
 import json
 import os
 import sys
@@ -74,15 +74,20 @@ def doa_composition(request, n, le):
     credentials = util.read_rabbit_credentials(rabbit_credentials_file)
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request DOA: ' + req_id + ' ::: ' + request['name'] )
-    topic = 'service.' + request['inputs'][0]['name']
-    message_dict = {'req_id': req_id, 'expected_outputs': request['outputs'], 'user_topic': 'user.response',
-                    'desc': 'request from main!!!', 'parameters': request['inputs']}
-    message_dict['messages_size'] = sys.getsizeof(str(message_dict))
-    producer = Producer(credentials)
-    measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,
-                   'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
-                   'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
-    producer.publish(topic, message_dict)
+    topics = []
+    for input in request['inputs']:
+        topic = 'service.' + input['name']
+        if topic not in topics:
+            topics.append(topic)
+    for topic in topics:
+        message_dict = {'req_id': req_id, 'expected_outputs': request['outputs'], 'user_topic': 'user.response',
+                        'desc': 'request from main!!!', 'parameters': request['inputs']}
+        message_dict['messages_size'] = sys.getsizeof(str(message_dict))
+        producer = Producer(credentials)
+        measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,
+                       'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
+                       'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
+        producer.publish(topic, message_dict)
     metrics[req_id] = measurement
     request_outputs[req_id] = {'outputs': request['outputs']}
 
@@ -166,7 +171,7 @@ def main(parameters_file):
     if 'conversation' in approaches or 'planning' in approaches:
         print('- Deploying synchronous services')
         services_sync = generator.get_services('sync', experiment, created_services)
-        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
+        #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_sync)
         data_access.remove_services()
 
     # Running experiments
@@ -188,6 +193,7 @@ def main(parameters_file):
                 while i < experiment_requests:
                     request_file = requests[i]
                     if approach == 'doa':
+                        input('Press something...')
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
