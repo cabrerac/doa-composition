@@ -59,6 +59,8 @@ def callback(ch, method, properties, body):
         if parameter not in responses:
             responses.append(parameter)
     request_responses[req_id] = responses
+    print(request_outputs[req_id]['outputs'])
+    print(request_responses[req_id])
     if util.compare(request_outputs[req_id]['outputs'], request_responses[req_id]):
         print('Response DOA request complete: ' + req_id)
         metrics[req_id]['response_time'] = int(round(time.time() * 1000))
