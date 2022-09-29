@@ -48,8 +48,11 @@ def compare(pars_1, pars_2):
 
 # compares if service outputs are in the expected outputs list
 def compare_outputs(expected_outputs, service_outputs):
+    names_expected = []
+    for expected_output in expected_outputs:
+        if expected_output['name'] not in names_expected:
+            names_expected.append(expected_output['name'])
     for service_output in service_outputs:
-        for expected_output in expected_outputs:
-            if service_output['name'] == expected_output['name']:
-                return True
+        if service_output['name'] in names_expected:
+            return True
     return False

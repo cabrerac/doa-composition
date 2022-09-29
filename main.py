@@ -48,7 +48,7 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     description = message['desc']
     next_topic = message['next_topic']
-    print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: ' + next_topic)
+    print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
@@ -80,6 +80,7 @@ def doa_composition(request, n, le):
         if topic not in topics:
             topics.append(topic)
     for topic in topics:
+        print(request['outputs'])
         message_dict = {'req_id': req_id, 'expected_outputs': request['outputs'], 'user_topic': 'user.response',
                         'desc': 'request from main!!!', 'parameters': request['inputs']}
         message_dict['messages_size'] = sys.getsizeof(str(message_dict))
@@ -176,7 +177,7 @@ def main(parameters_file):
 
     # Running experiments
     print('4. Running experiments...')
-    for services_number in services:
+    """for services_number in services:
         if 'conversation' in approaches or 'planning' in approaches:
             print('- Registering services: ' + str(services_number))
             registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
@@ -205,7 +206,7 @@ def main(parameters_file):
                     i = i + 1
                     time.sleep(2)
         if 'conversation' in approaches or 'planning' in approaches:
-            data_access.remove_services()
+            data_access.remove_services()"""
     # removing services from AWS
     print('7. Removing services...')
     if 'doa' in approaches:
