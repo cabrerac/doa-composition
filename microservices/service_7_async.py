@@ -16,8 +16,8 @@ requests = {}
 # callback to process asynchronous messages
 def callback(ch, method, properties, body):
     message = json.loads(body)
+    req_id = message['req_id']
     try:
-        req_id = message['req_id']
         inputs = []
         if req_id in requests:
             inputs = requests[req_id]
@@ -27,7 +27,7 @@ def callback(ch, method, properties, body):
             user_topic = message['user_topic']
             expected_outputs = message['expected_outputs']
             messages_size = message['messages_size']
-            ms = 0.0001
+            ms = 0.0038
             time.sleep(ms)
             outputs = description['outputs']
             for output in outputs:
@@ -44,6 +44,7 @@ def callback(ch, method, properties, body):
                 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
                 producer = Producer(credentials)
                 producer.publish(next_topic, message_dict)
+                producer = Producer(credentials)
                 producer.publish(user_topic, message_dict)
                 if req_id in requests:
                     del requests[req_id]
@@ -51,8 +52,7 @@ def callback(ch, method, properties, body):
             requests[req_id] = inputs
             user_topic = message['user_topic']
             message_dict = {
-                    'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: else', 'next_topic': 'service.' + output['name'],
-                    'parameters': outputs
+                'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ' + ex, 'next_topic': user_topic
             }
             credentials = util.read_rabbit_credentials(rabbit_credentials_file)
             producer = Producer(credentials)
@@ -60,7 +60,7 @@ def callback(ch, method, properties, body):
     except Exception as ex:
         user_topic = message['user_topic']
         message_dict = {
-                'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ' + ex, 'next_topic': user_topic
+                'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ' + str(ex), 'next_topic': user_topic
         }
         credentials = util.read_rabbit_credentials(rabbit_credentials_file)
         producer = Producer(credentials)

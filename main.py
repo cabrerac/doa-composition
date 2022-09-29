@@ -53,7 +53,7 @@ def callback(ch, method, properties, body):
     if req_id in request_responses:
         responses = request_responses[req_id]
     parameters = []
-    if parameters in message:
+    if 'parameters' in message:
         parameters = message['parameters']
     for parameter in parameters:
         if parameter not in responses:
@@ -176,7 +176,7 @@ def main(parameters_file):
 
     # Running experiments
     print('4. Running experiments...')
-    """for services_number in services:
+    for services_number in services:
         if 'conversation' in approaches or 'planning' in approaches:
             print('- Registering services: ' + str(services_number))
             registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
@@ -205,11 +205,11 @@ def main(parameters_file):
                     i = i + 1
                     time.sleep(2)
         if 'conversation' in approaches or 'planning' in approaches:
-            data_access.remove_services()"""
+            data_access.remove_services()
     # removing services from AWS
     print('7. Removing services...')
-    #if 'doa' in approaches:
-    #    deploy_to_aws.remove_services(services_async)
+    if 'doa' in approaches:
+        deploy_to_aws.remove_services(services_async)
     if 'conversation' in approaches or 'planning' in approaches:
         deploy_to_aws.remove_services(services_sync)
     # plotting results

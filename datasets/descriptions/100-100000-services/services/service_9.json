@@ -11,12 +11,12 @@
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_3",
+      "name": "_OUTPUT_SERVICE_4",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
   "name": "service_9",
   "description": "This is the service 9",
-  "priority_async": 19,
-  "priority_sync": 20
+  "priority_async": 15,
+  "priority_sync": 16
 }

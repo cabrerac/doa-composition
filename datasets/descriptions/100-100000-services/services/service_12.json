@@ -7,16 +7,16 @@
   ],
   "inputs": [
     {
-      "name": "_OUTPUT_SERVICE_10",
+      "name": "_OUTPUT_SERVICE_6",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     },
     {
-      "name": "_OUTPUT_SERVICE_11",
+      "name": "_OUTPUT_SERVICE_8",
       "type": "http://www.autoai.cam.ac.uk/dtypes.owl#numeric"
     }
   ],
   "name": "service_12",
   "description": "This is the service 12",
-  "priority_async": 71,
-  "priority_sync": 72
+  "priority_async": 67,
+  "priority_sync": 68
 }

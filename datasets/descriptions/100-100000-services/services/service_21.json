@@ -17,6 +17,6 @@
   ],
   "name": "service_21",
   "description": "This is the service 21",
-  "priority_async": 21,
-  "priority_sync": 22
+  "priority_async": 27,
+  "priority_sync": 28
 }
