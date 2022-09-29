@@ -1,4 +1,4 @@
-limport time
+import time
 import json
 import os
 import sys
@@ -166,7 +166,7 @@ def main(parameters_file):
     if 'doa' in approaches:
         print('- Deploying asynchronous services')
         services_async = generator.get_services('async', experiment, created_services)
-        deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
+        #deploy_to_aws.deploy_services('templates/doa-service-template.yml', services_async)
         rabbit_doa_consumer()
     if 'conversation' in approaches or 'planning' in approaches:
         print('- Deploying synchronous services')
@@ -176,7 +176,7 @@ def main(parameters_file):
 
     # Running experiments
     print('4. Running experiments...')
-    for services_number in services:
+    """for services_number in services:
         if 'conversation' in approaches or 'planning' in approaches:
             print('- Registering services: ' + str(services_number))
             registry_services = generator.get_services_to_register('sync', experiment, services_number, created_services)
@@ -205,7 +205,7 @@ def main(parameters_file):
                     i = i + 1
                     time.sleep(2)
         if 'conversation' in approaches or 'planning' in approaches:
-            data_access.remove_services()
+            data_access.remove_services()"""
     # removing services from AWS
     print('7. Removing services...')
     #if 'doa' in approaches:
