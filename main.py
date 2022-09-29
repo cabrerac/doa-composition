@@ -59,8 +59,6 @@ def callback(ch, method, properties, body):
         if parameter not in responses:
             responses.append(parameter)
     request_responses[req_id] = responses
-    print(request_outputs[req_id]['outputs'])
-    print(request_responses[req_id])
     if util.compare(request_outputs[req_id]['outputs'], request_responses[req_id]):
         print('Response DOA request complete: ' + req_id)
         metrics[req_id]['response_time'] = int(round(time.time() * 1000))
@@ -82,7 +80,6 @@ def doa_composition(request, n, le):
         if topic not in topics:
             topics.append(topic)
     for topic in topics:
-        print(request['outputs'])
         message_dict = {'req_id': req_id, 'expected_outputs': request['outputs'], 'user_topic': 'user.response',
                         'desc': 'request from main!!!', 'parameters': request['inputs']}
         message_dict['messages_size'] = sys.getsizeof(str(message_dict))
@@ -196,7 +193,6 @@ def main(parameters_file):
                 while i < experiment_requests:
                     request_file = requests[i]
                     if approach == 'doa':
-                        input('Press something...')
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
@@ -206,7 +202,7 @@ def main(parameters_file):
                         request = generator.get_request(dataset_path, experiment, 'conversation', length, request_file)
                         conversation_composition(external_url, request, services_number, length)
                     i = i + 1
-                    time.sleep(2)
+                    time.sleep(5)
         if 'conversation' in approaches or 'planning' in approaches:
             data_access.remove_services()
     # removing services from AWS
@@ -217,12 +213,12 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources
     print('9. Removing resources...')
-    #deploy_to_aws.remove_resources()
+    deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
     sys.exit()
 
