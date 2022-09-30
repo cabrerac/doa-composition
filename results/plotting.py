@@ -2,6 +2,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import seaborn as sns
 import matplotlib.pyplot as plt
+import networkx as nx
 from pathlib import Path
 
 
@@ -19,6 +20,16 @@ plt.rc('ytick', labelsize=SMALL_SIZE)
 plt.rc('legend', fontsize=SMALL_SIZE)
 plt.rc('figure', titlesize=LARGE_SIZE)
 sns.set_palette("Paired")
+
+
+# plots experiment results
+def plot_results(parameters):
+    experiment = parameters['experiment']
+    Path('./results/figs/' + experiment).mkdir(parents=True, exist_ok=True)
+    _plot_all_metrics(parameters)
+    _plot_services(parameters)
+    _plot_metrics(parameters)
+
 
 # plots all metrics in one graph
 def _plot_all_metrics(parameters):
@@ -202,10 +213,8 @@ def _plot_metrics(parameters):
         fig.savefig('./results/figs/' + experiment + '/' + metric + '-services-results.pdf')
 
 
-# plots experiment results
-def plot_results(parameters):
-    experiment = parameters['experiment']
-    Path('./results/figs/' + experiment).mkdir(parents=True, exist_ok=True)
-    _plot_all_metrics(parameters)
-    _plot_services(parameters)
-    _plot_metrics(parameters)
+# plots graph
+def plot_graph(path, graph):
+    nx.draw(graph)
+    plt.savefig(path, format="png")
+    plt.clf()

@@ -67,7 +67,6 @@ def execute_plan(request, plan, external_url):
                     break
             if ready:
                 service = task['services'][0]
-                #print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
                     parameters = {'inputs': request['inputs'][str(value)]}
@@ -78,6 +77,7 @@ def execute_plan(request, plan, external_url):
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
+                print('requesting service: ' + service['path'] + ' ::: ' + parameters)
                 response = client.make_request(external_url, service['path'], parameters)
                 responses.append(response)
                 outputs[value] = response.json()['outputs']

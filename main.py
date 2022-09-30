@@ -48,7 +48,7 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     description = message['desc']
     next_topic = message['next_topic']
-    #print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
+    print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
@@ -75,8 +75,8 @@ def doa_composition(request, n, le):
     req_id = 'doa_' + str(len(metrics) + 1)
     print('Request DOA: ' + req_id + ' ::: ' + request['name'] )
     topics = []
-    for input in request['inputs']:
-        topic = 'service.' + input['name']
+    for inp in request['inputs']:
+        topic = 'service.' + inp['name']
         if topic not in topics:
             topics.append(topic)
     for topic in topics:
@@ -148,7 +148,7 @@ def main(parameters_file):
     services = parameters['services']
     requests_number = parameters['requests_number']
     experiment_requests = parameters['experiment_requests']
-    deployable_services = 40
+    deployable_services = 45
     global results_file
     results_file = parameters['results_file']
 
@@ -159,7 +159,7 @@ def main(parameters_file):
     print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
     print('2. Creating experiment dataset...')
-    created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, lengths)
+    created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, experiment_requests, lengths)
     print('3. Deploying services in AWS...')
     services_async = []
     services_sync = []
@@ -213,7 +213,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources

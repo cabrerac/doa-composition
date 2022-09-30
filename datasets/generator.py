@@ -5,17 +5,20 @@ from pathlib import Path
 import networkx as nx
 import shutil
 from itertools import combinations
+import random
+from results import plotting
+import numpy as np
 
 
 # creates experiment dataset
-def create_dataset(path, experiment, deployable_services, requests_number, lengths):
+def create_dataset(path, experiment, deployable_services, requests_number, experiment_requests, lengths):
     if not os.path.exists(path + experiment + '/'):
-        g = nx.barabasi_albert_graph(deployable_services, 2)
+        g = nx.barabasi_albert_graph(deployable_services, 2, seed=np.random.seed())
         dag = nx.DiGraph([(u, v, {'weight': random.randint(-10, 10)}) for (u, v) in g.edges() if u < v])
         print('- Creating services and requests for experiment ' + experiment + '...')
         create_services_descriptions(experiment, dag)
         print('- Creating services requests for experiment ' + experiment + '...')
-        create_services_requests(requests_number, lengths, dag, experiment, path, deployable_services)
+        create_services_requests(requests_number, experiment_requests, lengths, dag, experiment, path, deployable_services)
         print('- Creating services implementations for experiment ' + experiment + '...')
         create_services_implementations(experiment, dag)
         return list(dag.nodes)
@@ -62,60 +65,15 @@ def create_services_descriptions(experiment, dag):
         priority_sync = priority_sync + 2
 
 
-# creates services implementation for m services
-def create_services_implementations(experiment, dag):
-    for node in dag.nodes:
-        t = random.random()
-        t = t / 100
-        t = round(t, 4)
-        fin = open('./datasets/templates/service_template_sync.txt', 'rt')
-        fout = open('./microservices/service_' + str(node) + '_sync.py', 'wt')
-        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
-        service = json.load(file)
-        service_name = service['name']
-        for line in fin:
-            fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
-        fin.close()
-        fout.close()
-
-        fin = open('./datasets/templates/service_template_async.txt', 'rt')
-        fout = open('./microservices/service_' + str(node) + '_async.py', 'wt')
-        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
-        service = json.load(file)
-        service_name = service['name']
-        for line in fin:
-            fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
-        fin.close()
-        fout.close()
-
-        fin = open('./datasets/templates/docker-template-sync', 'rt')
-        fout = open('./dockers/service-' + str(node) + '-sync', 'wt')
-        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
-        service = json.load(file)
-        service_name = service['name']
-        for line in fin:
-            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
-        fin.close()
-        fout.close()
-
-        fin = open('./datasets/templates/docker-template-async', 'rt')
-        fout = open('./dockers/service-' + str(node) + '-async', 'wt')
-        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
-        service = json.load(file)
-        service_name = service['name']
-        for line in fin:
-            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
-        fin.close()
-        fout.close()
-
-
-# creates r requests for lengths based on a dag for a given experiment 
-def create_services_requests(r, lengths, dag, experiment, path, deployable_services):
+# creates r requests for lengths based on a dag for a given experiment
+def create_services_requests(requests_number, experiment_requests, lengths, dag, experiment, path, deployable_services):
     Path('./datasets/descriptions/' + experiment + '/requests/goal').mkdir(parents=True, exist_ok=True)
     Path('./datasets/descriptions/' + experiment + '/requests/conversation').mkdir(parents=True, exist_ok=True)
+    Path('./datasets/descriptions/' + experiment + '/requests/graph').mkdir(parents=True, exist_ok=True)
     for length in lengths:
         Path('./datasets/descriptions/' + experiment + '/requests/goal/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         Path('./datasets/descriptions/' + experiment + '/requests/conversation/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
+        Path('./datasets/descriptions/' + experiment + '/requests/graph/' + str(length) + '/').mkdir(parents=True, exist_ok=True)
         requests = []
         print('-- Creating requests for length ' + str(length) + '...') 
         for nodes in combinations(dag.nodes, length):
@@ -131,22 +89,32 @@ def create_services_requests(r, lengths, dag, experiment, path, deployable_servi
                             break
                     if not add:
                         break
+                    successors = dag_sub.successors(node)
+                    successors = list(dict.fromkeys(successors))
+                    edges = random.uniform(0.5, 0.75)
+                    limit = int(edges*length)
+                    if len(successors) > limit:
+                        add = False
+                    if not add:
+                        break
                 if add:
                     requests.append(dag_sub)
-            if len(requests) >= r:
+                    graph_file = './datasets/descriptions/' + experiment + '/requests/graph/' + str(length) + '/request_' + str(len(requests) - 1) + '.png'
+                    plotting.plot_graph(graph_file, dag_sub)
+            if len(requests) >= requests_number:
                 break
-        if len(requests) == r:
+        if len(requests) > experiment_requests:
             req = 0
             for request in requests:
                 _create_conversation_request(experiment, length, req, request)
                 _create_goal_request(experiment, length, req, request)
                 req = req + 1
         else:
-            print('Not enought requests in graph...')
+            print('Not enough requests in graph...')
             print('Recreating dataset...')
             if os.path.exists(path + experiment + '/'):
                 shutil.rmtree(path + experiment + '/')
-            create_dataset(path, experiment, deployable_services, r, lengths)
+            create_dataset(path, experiment, deployable_services, requests_number, experiment_requests, lengths)
             break
 
 
@@ -219,6 +187,53 @@ def _create_conversation_request(experiment, length, req, dag):
     if not os.path.exists(request_file):
         with open(request_file, 'w') as f:
             json.dump(conversation_template, f, indent=2)
+
+
+# creates services implementation for m services
+def create_services_implementations(experiment, dag):
+    for node in dag.nodes:
+        t = random.random()
+        t = t / 100
+        t = round(t, 4)
+        fin = open('./datasets/templates/service_template_sync.txt', 'rt')
+        fout = open('./microservices/service_' + str(node) + '_sync.py', 'wt')
+        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        service_name = service['name']
+        for line in fin:
+            fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
+        fin.close()
+        fout.close()
+
+        fin = open('./datasets/templates/service_template_async.txt', 'rt')
+        fout = open('./microservices/service_' + str(node) + '_async.py', 'wt')
+        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        service_name = service['name']
+        for line in fin:
+            fout.write(line.replace('<service>', service_name).replace('<time>', str(t)))
+        fin.close()
+        fout.close()
+
+        fin = open('./datasets/templates/docker-template-sync', 'rt')
+        fout = open('./dockers/service-' + str(node) + '-sync', 'wt')
+        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        service_name = service['name']
+        for line in fin:
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
+        fin.close()
+        fout.close()
+
+        fin = open('./datasets/templates/docker-template-async', 'rt')
+        fout = open('./dockers/service-' + str(node) + '-async', 'wt')
+        file = open('./datasets/descriptions/' + experiment + '/services/service_' + str(node) + '.json')
+        service = json.load(file)
+        service_name = service['name']
+        for line in fin:
+            fout.write(line.replace('<service>', service_name).replace('<experiment>', experiment))
+        fin.close()
+        fout.close()
 
 
 # defines services to deploy in the AWS infrastructure

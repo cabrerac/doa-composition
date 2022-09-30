@@ -126,7 +126,6 @@ def execute_plan(request, services, graph, plan, external_url):
                     break
             if ready:
                 service = services[value]
-                #print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
                     parameters = {'inputs': request['inputs']}
@@ -137,6 +136,7 @@ def execute_plan(request, services, graph, plan, external_url):
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
+                print('requesting service: ' + service['path'] + ' ::: ' + parameters)
                 response = client.make_request(external_url, service['path'], parameters)
                 responses.append(response)
                 outputs[value] = response.json()['outputs']
