@@ -126,7 +126,7 @@ def execute_plan(request, services, graph, plan, external_url):
                     break
             if ready:
                 service = services[value]
-                print('requesting service: ' + service['path'])
+                #print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
                     parameters = {'inputs': request['inputs']}

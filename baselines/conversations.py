@@ -67,7 +67,7 @@ def execute_plan(request, plan, external_url):
                     break
             if ready:
                 service = task['services'][0]
-                print('requesting service: ' + service['path'])
+                #print('requesting service: ' + service['path'])
                 parameters = {}
                 if index == 0:
                     parameters = {'inputs': request['inputs'][str(value)]}

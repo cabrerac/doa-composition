@@ -48,7 +48,7 @@ def callback(ch, method, properties, body):
     req_id = message['req_id']
     description = message['desc']
     next_topic = message['next_topic']
-    print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
+    #print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
     responses = []
     if req_id in request_responses:
         responses = request_responses[req_id]
@@ -213,7 +213,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    plotting.plot_results(parameters)
+    #plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources
