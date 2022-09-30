@@ -110,6 +110,14 @@ def _plot_metrics(parameters):
     lengths = parameters['lengths']
     results = pd.read_csv(results_file)
     metrics = ['response-time', 'execution-time', 'planning-time']
+    approaches = []
+    for approach in parameters['approaches']:
+        if approach == 'doa':
+            approaches.append('DOA')
+        if approach == 'conversation':
+            approaches.append('Conversation')
+        if approach == 'planning':
+            approaches.append('Planning')
     for metric in metrics:
         index1 = 0
         index2 = 0
@@ -128,7 +136,7 @@ def _plot_metrics(parameters):
             if metric == 'response-time':
                 g = sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
-                #g.set_xticklabels(['Conversation', 'Planning'])
+                g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
@@ -137,7 +145,7 @@ def _plot_metrics(parameters):
             if metric == 'execution-time':
                 g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
-                #g.set_xticklabels(['Conversation', 'Planning'])
+                g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
@@ -146,7 +154,7 @@ def _plot_metrics(parameters):
             if metric == 'planning-time':
                 g = sns.barplot(x='approach', y='planning_time', hue='length', data=filtered_results, ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
-                #g.set_xticklabels(['Conversation', 'Planning'])
+                g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
@@ -175,7 +183,7 @@ def _plot_metrics(parameters):
                 filtered_results['messages_size'] = filtered_results['messages_size']/1024
                 g = sns.boxplot(x="approach", y='messages_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
                 axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
-                #g.set_xticklabels(['Conversation', 'Planning'])
+                g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
@@ -186,7 +194,7 @@ def _plot_metrics(parameters):
                 filtered_results['input_size'] = filtered_results['input_size'] / 1024
                 g = sns.boxplot(x='approach', y='input_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
                 axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
-                #g.set_xticklabels(['Conversation', 'Planning'])
+                g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
                 axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
