@@ -17,9 +17,14 @@ class Producer:
         self.connection = pika.BlockingConnection(rabbit_parameters)
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='messages', exchange_type='topic', durable=True)
+        self.channel.confirm_delivery()
 
     def publish(self, routing_key, body):
-        body_json = json.dumps(body, indent=4)
-        self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body_json)
-        print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
-        self.connection.close()
+        try:
+            body_json = json.dumps(body, indent=4)
+            self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body_json, properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE), mandatory=True)
+            self.connection.close()
+            print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
+            return True
+        except pika.exceptions.UnroutableError:
+            return False

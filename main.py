@@ -87,7 +87,9 @@ def doa_composition(request, n, le):
         measurement = {'id': req_id, 'name': request['name'], 'approach': 'doa', 'services': n, 'length': le,
                        'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                        'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
-        producer.publish(topic, message_dict)
+        sent = producer.publish(topic, message_dict)
+        if not sent:
+            sent = producer.publish(topic, message_dict)
     metrics[req_id] = measurement
     request_outputs[req_id] = {'outputs': request['outputs']}
 
@@ -153,14 +155,14 @@ def main(parameters_file):
     results_file = parameters['results_file']
 
     # deploying AWS resources
-    print('1. Deploying resources...')
+    """print('1. Deploying resources...')
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
-    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
+    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)"""
 
     print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, experiment_requests, lengths)
-    print('3. Deploying services in AWS...')
+    """print('3. Deploying services in AWS...')
     services_async = []
     services_sync = []
     if 'doa' in approaches:
@@ -227,4 +229,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')
+        print('Please provide the experiments parameters file path in the correct format...')"""
+
+main('./experiments/100_100000_services.json')

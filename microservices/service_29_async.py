@@ -17,6 +17,7 @@ requests = {}
 def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
+    ch.basic_ack(delivery_tag = method.delivery_tag)
     try:
         inputs = []
         if req_id in requests:
@@ -27,7 +28,7 @@ def callback(ch, method, properties, body):
             user_topic = message['user_topic']
             expected_outputs = message['expected_outputs']
             messages_size = message['messages_size']
-            ms = 0.0068
+            ms = 0.0017
             time.sleep(ms)
             outputs = description['outputs']
             for output in outputs:
@@ -44,20 +45,14 @@ def callback(ch, method, properties, body):
                     message_dict['next_topic'] = next_topic
                 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
                 producer = Producer(credentials)
-                producer.publish(next_topic, message_dict)
-                #producer = Producer(credentials)
-                #producer.publish(user_topic, message_dict)
+                sent = producer.publish(next_topic, message_dict)
+                if not sent:
+                    message_dict['desc'] = message_dict['desc'] + ' ::: message not confirmed'
+                    sent = producer.publish(user_topic, message_dict)
                 if req_id in requests:
                     del requests[req_id]
         else:
             requests[req_id] = inputs
-            #user_topic = message['user_topic']
-            #message_dict = {
-            #    'req_id': req_id, 'user_topic': user_topic, 'desc': 'message from ' + description['name'] + '_async ::: ', 'next_topic': user_topic
-            #}
-            #credentials = util.read_rabbit_credentials(rabbit_credentials_file)
-            #producer = Producer(credentials)
-            #producer.publish(user_topic, message_dict)
     except Exception as ex:
         user_topic = message['user_topic']
         message_dict = {
@@ -65,7 +60,9 @@ def callback(ch, method, properties, body):
         }
         credentials = util.read_rabbit_credentials(rabbit_credentials_file)
         producer = Producer(credentials)
-        producer.publish(user_topic, message_dict)
+        sent = producer.publish(user_topic, message_dict)
+        if not sent:
+            sent = producer.publish(user_topic, message_dict)
 
 
 # creates a messages listener per each service input

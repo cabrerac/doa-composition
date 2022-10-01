@@ -17,7 +17,7 @@ def service_1_sync():
         parameters = request.get_json(silent=True)
         if parameters == None:
             parameters = {}
-        ms = 0.008
+        ms = 0.0004
         inputs = []
         if 'inputs' in parameters:
             inputs = parameters['inputs']

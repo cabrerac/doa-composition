@@ -20,7 +20,7 @@ def create_dataset(path, experiment, deployable_services, requests_number, exper
         print('- Creating services requests for experiment ' + experiment + '...')
         create_services_requests(requests_number, experiment_requests, lengths, dag, experiment, path, deployable_services)
         print('- Creating services implementations for experiment ' + experiment + '...')
-        create_services_implementations(experiment, dag)
+        create_services_implementations(experiment, dag.nodes)
         return list(dag.nodes)
     else:
         created_services = []
@@ -28,6 +28,7 @@ def create_dataset(path, experiment, deployable_services, requests_number, exper
         files = os.listdir(path + experiment + '/services/')
         for file in files:
             created_services.append(file.split('.')[0].split('_')[1])
+        create_services_implementations(experiment, created_services)
         return created_services
 
 
@@ -190,8 +191,8 @@ def _create_conversation_request(experiment, length, req, dag):
 
 
 # creates services implementation for m services
-def create_services_implementations(experiment, dag):
-    for node in dag.nodes:
+def create_services_implementations(experiment, nodes):
+    for node in nodes:
         t = random.random()
         t = t / 100
         t = round(t, 4)
