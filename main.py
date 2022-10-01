@@ -155,14 +155,14 @@ def main(parameters_file):
     results_file = parameters['results_file']
 
     # deploying AWS resources
-    """print('1. Deploying resources...')
+    print('1. Deploying resources...')
     external_url, rabbitmq_url = deploy_to_aws.deploy_resources('templates/doa-resources-template.yml', './rabbit-mq.yaml')
     print('Load Balancer URL: ' + external_url)
-    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)"""
+    print('RabbitMQ Endpoint URL: ' + rabbitmq_url)
 
     print('2. Creating experiment dataset...')
     created_services = generator.create_dataset(dataset_path, experiment, deployable_services, requests_number, experiment_requests, lengths)
-    """print('3. Deploying services in AWS...')
+    print('3. Deploying services in AWS...')
     services_async = []
     services_sync = []
     if 'doa' in approaches:
@@ -229,6 +229,4 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')"""
-
-main('./experiments/100_100000_services.json')
+        print('Please provide the experiments parameters file path in the correct format...')
