@@ -77,7 +77,7 @@ def execute_plan(request, plan, external_url):
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
-                print('requesting service: ' + service['path'] + ' ::: ' + parameters)
+                print('requesting service: ' + service['path'] + ' ::: ' + str(parameters))
                 response = client.make_request(external_url, service['path'], parameters)
                 responses.append(response)
                 outputs[value] = response.json()['outputs']
