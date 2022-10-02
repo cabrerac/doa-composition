@@ -115,6 +115,7 @@ def execute_plan(request, services, graph, plan, external_url):
         values = plan[index]
         for value in values:
             predecessors = graph.predecessors(value)
+            predecessors = list(dict.fromkeys(predecessors))
             ready = True
             for predecessor in predecessors:
                 if predecessor not in executed:
@@ -132,11 +133,13 @@ def execute_plan(request, services, graph, plan, external_url):
                 else:
                     inputs = []
                     for predecessor in predecessors:
+                        print('predecessor: ' + str(predecessor))
+                        print(str(outputs))
                         if predecessor in outputs:
                             for output in outputs[predecessor]:
                                 inputs.append(output)
                     parameters = {'inputs': inputs}
-                print('requesting service: ' + service['path'] + ' ::: ' + str(parameters))
+                print('requesting service: ' + service['path'])
                 response = client.make_request(external_url, service['path'], parameters)
                 responses.append(response)
                 outputs[value] = response.json()['outputs']

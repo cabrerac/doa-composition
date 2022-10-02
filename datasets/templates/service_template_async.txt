@@ -46,9 +46,6 @@ def callback(ch, method, properties, body):
                 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
                 producer = Producer(credentials)
                 sent = producer.publish(next_topic, message_dict)
-                if not sent:
-                    message_dict['desc'] = message_dict['desc'] + ' ::: message not confirmed'
-                    sent = producer.publish(user_topic, message_dict)
                 if req_id in requests:
                     del requests[req_id]
         else:
