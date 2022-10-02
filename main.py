@@ -215,7 +215,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_async)
     if 'conversation' in approaches or 'planning' in approaches:
         deploy_to_aws.remove_services(services_sync)
-     plotting results
+    # plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
     print('Waiting before removing resources...')
