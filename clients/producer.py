@@ -22,9 +22,7 @@ class Producer:
     def publish(self, routing_key, body):
         try:
             body_json = json.dumps(body, indent=4)
-            print("message-producer")
             self.channel.basic_publish(exchange='messages', routing_key=routing_key, body=body_json, properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE), mandatory=True)
-            print("after message producer")
             self.connection.close()
             print(" [x] Sent to " + routing_key + " Message: " + body['desc'])
             return True

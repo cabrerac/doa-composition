@@ -89,7 +89,6 @@ def doa_composition(request, n, le):
                        'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                        'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
         sent = producer.publish(topic, message_dict)
-        print(str(sent))
         if not sent:
             sent = producer.publish(topic, message_dict)
     metrics[req_id] = measurement
@@ -195,8 +194,10 @@ def main(parameters_file):
                 requests = all_requests[length]
                 i = 0
                 while i < experiment_requests:
-                    request_file = requests[i]
+                    request_file = 'request_9.json'
+                    #request_file = requests[i]
                     if approach == 'doa':
+                        input('press any key...')
                         request = generator.get_request(dataset_path, experiment, 'goal', length, request_file)
                         doa_composition(request, services_number, length)
                     if approach == 'planning':
@@ -217,7 +218,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    plotting.plot_results(parameters)
+    #plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources

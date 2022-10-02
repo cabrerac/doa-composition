@@ -23,7 +23,7 @@ def callback(ch, method, properties, body):
         if req_id in requests:
             inputs = requests[req_id]
         for input in message['parameters']:
-            if input in inputs:
+            if input not in inputs:
                 inputs.append(input)
         if util.compare(description['inputs'], inputs):
             user_topic = message['user_topic']
