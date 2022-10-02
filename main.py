@@ -1,4 +1,6 @@
-import time
+from results import plotting
+import json
+"""import time
 import json
 import os
 import sys
@@ -216,7 +218,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_sync)
     # plotting results
     print('8. Plotting results...')
-    #plotting.plot_results(parameters)
+    plotting.plot_results(parameters)
     print('Waiting before removing resources...')
     time.sleep(900)
     # removing AWS resources
@@ -230,4 +232,5 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')
+        print('Please provide the experiments parameters file path in the correct format...')"""
+
