@@ -46,6 +46,7 @@ def rabbit_doa_consumer():
 def callback(ch, method, properties, body):
     message = json.loads(body)
     req_id = message['req_id']
+    ch.basic_ack(delivery_tag = method.delivery_tag)
     description = message['desc']
     next_topic = message['next_topic']
     print('Response DOA request: ' + req_id + ' ::: ' + description + ' ::: to: ' + next_topic)
@@ -88,6 +89,7 @@ def doa_composition(request, n, le):
                        'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                        'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
         sent = producer.publish(topic, message_dict)
+        print(str(sent))
         if not sent:
             sent = producer.publish(topic, message_dict)
     metrics[req_id] = measurement
@@ -213,7 +215,7 @@ def main(parameters_file):
         deploy_to_aws.remove_services(services_async)
     if 'conversation' in approaches or 'planning' in approaches:
         deploy_to_aws.remove_services(services_sync)
-    # plotting results
+     plotting results
     print('8. Plotting results...')
     plotting.plot_results(parameters)
     print('Waiting before removing resources...')

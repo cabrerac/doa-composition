@@ -17,7 +17,7 @@ class Consumer(threading.Thread):
                                                       ssl_options=pika.SSLOptions(rabbit_context))
         self.connection = pika.BlockingConnection(rabbit_parameters)
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange='messages', exchange_type='topic', durable=True)
+        self.channel.exchange_declare(exchange='messages', exchange_type='topic', durable=False)
         result = self.channel.queue_declare(queue='', exclusive=True)
         queue_name = result.method.queue
         self.channel.queue_bind(exchange='messages', queue=queue_name, routing_key=binding_key)

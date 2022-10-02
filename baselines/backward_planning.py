@@ -133,8 +133,6 @@ def execute_plan(request, services, graph, plan, external_url):
                 else:
                     inputs = []
                     for predecessor in predecessors:
-                        print('predecessor: ' + str(predecessor))
-                        print(str(outputs))
                         if predecessor in outputs:
                             for output in outputs[predecessor]:
                                 inputs.append(output)
