@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import time
 import shutil
 from cfn_tools import load_yaml
 import cfn_flip.yaml_dumper
@@ -69,6 +70,7 @@ def deploy_services(service_template_path, services):
                                 aws_secret_access_key=secret_access_key, region_name=aws_region)
     # for each service push image and create stack
     for service in services:
+        time.sleep(1)
         print('Deploying service: ' + service['name'] + '...')
         stack_name = service['name'].replace('_','-') + '-stack'
         exists, stack_id = _stack_exists(cloud_client, stack_name)

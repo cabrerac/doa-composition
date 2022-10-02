@@ -23,12 +23,13 @@ def callback(ch, method, properties, body):
         if req_id in requests:
             inputs = requests[req_id]
         for input in message['parameters']:
-            inputs.append(input)
+            if input not in inputs:
+                inputs.append(input)
         if util.compare(description['inputs'], inputs):
             user_topic = message['user_topic']
             expected_outputs = message['expected_outputs']
             messages_size = message['messages_size']
-            ms = 0.0035
+            ms = 0.0025
             time.sleep(ms)
             outputs = description['outputs']
             for output in outputs:
@@ -46,9 +47,6 @@ def callback(ch, method, properties, body):
                 credentials = util.read_rabbit_credentials(rabbit_credentials_file)
                 producer = Producer(credentials)
                 sent = producer.publish(next_topic, message_dict)
-                if not sent:
-                    message_dict['desc'] = message_dict['desc'] + ' ::: message not confirmed'
-                    sent = producer.publish(user_topic, message_dict)
                 if req_id in requests:
                     del requests[req_id]
         else:
