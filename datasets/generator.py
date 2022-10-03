@@ -293,8 +293,7 @@ def get_requests(path, experiment, experiment_requests, length):
     path = path + experiment + '/requests/goal/' + str(length) + '/'
     while len(requests) < experiment_requests:
         request_file = random.choice(os.listdir(path))
-        if request_file not in requests:
-            requests.append(request_file)
+        requests.append(request_file)
     return requests
 
 
