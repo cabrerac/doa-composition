@@ -1,6 +1,4 @@
-from results import plotting
-import json
-"""import time
+import time
 import json
 import os
 import sys
@@ -91,8 +89,6 @@ def doa_composition(request, n, le):
                        'request_time': int(round(time.time() * 1000)), 'response_time': 0, 'planning_time': 0,
                        'execution_time': 0, 'total_time': 0, 'messages_size': 0, 'input_size': sys.getsizeof(str(request))}
         sent = producer.publish(topic, message_dict)
-        if not sent:
-            sent = producer.publish(topic, message_dict)
     metrics[req_id] = measurement
     request_outputs[req_id] = {'outputs': request['outputs']}
 
@@ -225,12 +221,11 @@ def main(parameters_file):
     print('9. Removing resources...')
     deploy_to_aws.remove_resources()
     print(" *** Experiments finished *** ")
-    sys.exit()
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')"""
+        print('Please provide the experiments parameters file path in the correct format...')
 
