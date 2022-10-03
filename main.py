@@ -228,4 +228,3 @@ if __name__ == "__main__":
         main(sys.argv[1])
     else:
         print('Please provide the experiments parameters file path in the correct format...')
-

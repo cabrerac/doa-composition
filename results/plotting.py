@@ -145,7 +145,7 @@ def _plot_metrics(parameters):
                 index2 = 1
             filtered_results = results.loc[results['services'] == services_number]
             if metric == 'response-time':
-                g = sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, ax=axs[index1][index2])
+                g = sns.barplot(x='approach', y='total_time', hue='length', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
@@ -154,7 +154,7 @@ def _plot_metrics(parameters):
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
             if metric == 'execution-time':
-                g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, ax=axs[index1][index2])
+                g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
@@ -163,7 +163,7 @@ def _plot_metrics(parameters):
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
             if metric == 'planning-time':
-                g = sns.barplot(x='approach', y='planning_time', hue='length', data=filtered_results, ax=axs[index1][index2])
+                g = sns.barplot(x='approach', y='planning_time', hue='length', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
@@ -188,11 +188,12 @@ def _plot_metrics(parameters):
             if length == 20:
                 index1 = 1
                 index2 = 1
+            colors = []
             if metric == 'messages-size':
                 filtered_results = results.loc[results['services'] == 100000]
                 filtered_results = filtered_results.loc[filtered_results['length'] == length]
                 filtered_results['messages_size'] = filtered_results['messages_size']/1024
-                g = sns.boxplot(x="approach", y='messages_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
+                g = sns.barplot(x="approach", y='messages_size', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
@@ -203,7 +204,7 @@ def _plot_metrics(parameters):
                 filtered_results = results.loc[results['services'] == 100000]
                 filtered_results = filtered_results.loc[filtered_results['length'] == length]
                 filtered_results['input_size'] = filtered_results['input_size'] / 1024
-                g = sns.boxplot(x='approach', y='input_size', hue='length', data=filtered_results, ax=axs[index1][index2], orient='v')
+                g = sns.barplot(x='approach', y='input_size', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=('Composition graphs of size ' + str(length)))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
