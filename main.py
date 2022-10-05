@@ -1,4 +1,6 @@
-import time
+import json
+from results import plotting
+"""import time
 import json
 import os
 import sys
@@ -227,4 +229,9 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
-        print('Please provide the experiments parameters file path in the correct format...')
+        print('Please provide the experiments parameters file path in the correct format...')"""
+
+parameters_file = './experiments/100_100000_services.json'
+file = open(parameters_file)
+parameters = json.load(file)
+plotting.plot_results(parameters)
