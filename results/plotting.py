@@ -124,7 +124,7 @@ def _plot_metrics(parameters):
     approaches = []
     for approach in parameters['approaches']:
         if approach == 'doa':
-            approaches.append('DOA')
+            approaches.append('Data-oriented')
         if approach == 'conversation':
             approaches.append('Conversation')
         if approach == 'planning':
