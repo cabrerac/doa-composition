@@ -150,27 +150,27 @@ def _plot_metrics(parameters):
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
-                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
+                axs[index1][index2].grid(linestyle='-', linewidth=0.5, alpha=0.25, axis='both', color='grey')
             if metric == 'execution-time':
                 g = sns.barplot(x='approach', y='execution_time', hue='length', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
-                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
+                axs[index1][index2].grid(linestyle='-', linewidth=0.5, alpha=0.25, axis='both', color='grey')
             if metric == 'planning-time':
                 g = sns.barplot(x='approach', y='planning_time', hue='length', data=filtered_results, errorbar='sd', ax=axs[index1][index2])
                 axs[index1][index2].set(title=(str(services_number) + ' services in registry'))
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Milliseconds (ms)'))
-                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 handles, labels = axs[index1][index2].get_legend_handles_labels()
                 axs[index1][index2].legend(handles, labels, title='Graph Size')
+                axs[index1][index2].grid(linestyle='-', linewidth=0.5, alpha=0.25, axis='both', color='grey')
         fig.savefig('./results/figs/' + experiment + '/' + metric + '-services-results.pdf')
 
     metrics = ['messages-size', 'input-size']
@@ -198,8 +198,8 @@ def _plot_metrics(parameters):
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
-                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 axs[index1][index2].legend([], [], frameon=False)
+                axs[index1][index2].grid(linestyle='-', linewidth=0.5, alpha=0.25, axis='both', color='grey')
             if metric == 'input-size':
                 filtered_results = results.loc[results['services'] == 100000]
                 filtered_results = filtered_results.loc[filtered_results['length'] == length]
@@ -209,8 +209,8 @@ def _plot_metrics(parameters):
                 g.set_xticklabels(approaches)
                 axs[index1][index2].set(xlabel=('Approach'))
                 axs[index1][index2].set(ylabel=('Kilobytes (KBs)'))
-                axs[index1][index2].grid(linestyle='-', linewidth='1.0', color='grey')
                 axs[index1][index2].legend([], [], frameon=False)
+                axs[index1][index2].grid(linestyle='-', linewidth=0.5, alpha=0.25, axis='both', color='grey')
         fig.savefig('./results/figs/' + experiment + '/' + metric + '-services-results.pdf')
 
 
