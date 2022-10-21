@@ -30,7 +30,7 @@ cd doa-composition/
 2. Create and activate virtual environment 
 
 ```
-python3 -m venv venv
+python -m venv venv
 ```
 ```
 source venv/bin/activate
