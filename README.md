@@ -8,7 +8,7 @@ One key element of this project is the automatic deployment of infrastructure re
 
 ## Services Dataset
 
-Experiments use datasets of services which include service descriptions, service implementations using the Flask framework, and service requests. These datasets are generated [here](https://github.com/cabrerac/doa-composition/blob/main/datasets/generator.py).
+Experiments use datasets of services which include service descriptions, service implementations, service requests, and service compositions (i.e., graphs of services). These datasets are synthetically  generated [here](https://github.com/cabrerac/doa-composition/blob/main/datasets/generator.py).
 
 ## Service Composition
 
