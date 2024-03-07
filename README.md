@@ -45,7 +45,7 @@ pip install  -r requirements.txt
 4. Run the main passing the experiments parameters file. For example:
 
 ```
-python main.py ./experiments/100_10000_services.json
+python main.py ./experiments/100_100000_services.json
 ```
 
 The code uses AWS credentials to log into AWS from console. These credetils can be conigured as context variables:
