@@ -14,7 +14,7 @@ COPY requirements-microservices.txt .
 RUN pip install -r requirements-microservices.txt
 
 # Copy the microservice code to the working directory
-COPY microservices/service_31_sync.py .
+COPY microservices/service_1_sync.py .
 
 # Create logic directory
 RUN mkdir ./logic
@@ -26,7 +26,7 @@ COPY microservices/logic/util.py ./logic/
 RUN mkdir ./description
 
 # Copy the service description
-COPY datasets/descriptions/100-100000-services/services/service_31.json ./description/
+COPY datasets/descriptions/100-100000-services/services/service_1.json ./description/
 
 # Specify the command to run on container start
-CMD ["python", "./service_31_sync.py"]
+CMD ["python", "./service_1_sync.py"]

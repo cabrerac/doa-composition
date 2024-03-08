@@ -1,9 +1,9 @@
 {
   "experiment": "100-100000-services",
-  "approaches": ["doa", "planning", "conversation"],
-  "lengths": [5, 10, 15, 20],
-  "services": [100, 1000, 10000, 100000],
-  "requests_number": 20,
+  "approaches": ["conversation", "doa"],
+  "lengths": [5],
+  "services": [100],
+  "requests_number": 5,
   "experiment_requests": 100,
   "results_file": "./results/data/100_100000_services.csv"
 }
